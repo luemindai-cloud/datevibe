@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Deedi Admin Login</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #ff8fc7,
+                    #170914 65%
+                );
+
+            color: white;
+        }
+
+        .login-box {
+
+            width: 90%;
+            max-width: 400px;
+
+            padding: 35px;
+
+            border-radius: 25px;
+
+            background: rgba(255,255,255,0.10);
+
+            border: 1px solid
+                    rgba(255,255,255,0.25);
+
+            backdrop-filter: blur(20px);
+
+            box-shadow:
+                0 0 40px
+                rgba(255,50,150,0.35);
+        }
+
+        .logo {
+
+            text-align: center;
+
+            font-size: 32px;
+
+            font-weight: bold;
+
+            color: #ff72b6;
+
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+
+            text-align: center;
+
+            color: #ddd;
+
+            margin-bottom: 30px;
+        }
+
+        input {
+
+            width: 100%;
+
+            padding: 14px;
+
+            margin-bottom: 15px;
+
+            border-radius: 12px;
+
+            border: 1px solid
+                    rgba(255,255,255,0.25);
+
+            background:
+                rgba(0,0,0,0.25);
+
+            color: white;
+
+            outline: none;
+
+            font-size: 15px;
+        }
+
+        input::placeholder {
+            color: #bbb;
+        }
+
+        button {
+
+            width: 100%;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff4fa3,
+                    #ff8bca
+                );
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 0 20px
+                rgba(255,70,160,0.35);
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .error {
+
+            margin-bottom: 15px;
+
+            padding: 10px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,0,70,0.15);
+
+            color: #ff9bbb;
+
+            text-align: center;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <div class="logo">
+        <img src="/static/images/logo.jpeg" 
+             alt="DateVibe Admin" 
+             style="width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 4px 8px rgba(255,80,150,0.3));">
+        <span style="color: #ff72b6; font-weight: bold;">DateVibe Admin</span>
+    </div>min Control Panel
+    </div>
+
+    <div
+        class="error"
+        th:if="${error}"
+        th:text="${error}">
+    </div>
+
+    <form
+        action="/admin/login"
+        method="post">
+
+        <input
+            type="text"
+            name="username"
+            placeholder="Admin Username"
+            required>
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Admin Password"
+            required>
+
+        <button type="submit">
+            Login to Admin Panel
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+
+</html>

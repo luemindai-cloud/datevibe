@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Deedi Admin - Payment Details</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #ff82bd,
+                    #160912 60%
+                );
+
+            color: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 20px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,0.15);
+
+            background:
+                rgba(0,0,0,0.25);
+
+            backdrop-filter: blur(15px);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff72b6;
+        }
+
+        .back {
+            color: white;
+            text-decoration: none;
+
+            padding: 10px 16px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,70,150,0.25);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        .user-card {
+            padding: 25px;
+
+            border-radius: 20px;
+
+            background:
+                rgba(255,255,255,0.10);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.20);
+
+            backdrop-filter: blur(15px);
+
+            box-shadow:
+                0 0 25px
+                rgba(255,50,150,0.15);
+
+            margin-bottom: 30px;
+        }
+
+        .user-name {
+            font-size: 28px;
+            font-weight: bold;
+
+            color: #ff91c7;
+
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(190px, 1fr)
+                );
+
+            gap: 15px;
+        }
+
+        .info-box {
+            padding: 18px;
+
+            border-radius: 15px;
+
+            background:
+                rgba(0,0,0,0.20);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.10);
+        }
+
+        .info-label {
+            color: #aaa;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .info-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .paid {
+            color: #7CFFB2;
+        }
+
+        .unpaid {
+            color: #ff8c8c;
+        }
+
+        .section-title {
+            color: #ff91c7;
+            font-size: 24px;
+
+            margin-bottom: 20px;
+        }
+
+        .payment-card {
+            padding: 20px;
+
+            margin-bottom: 15px;
+
+            border-radius: 18px;
+
+            background:
+                rgba(255,255,255,0.08);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.15);
+
+            backdrop-filter: blur(15px);
+        }
+
+        .payment-top {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin-bottom: 15px;
+        }
+
+        .amount {
+            font-size: 25px;
+
+            font-weight: bold;
+
+            color: #ffd36a;
+        }
+
+        .status {
+            padding: 7px 13px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+
+            font-weight: bold;
+        }
+
+        .success {
+            background:
+                rgba(80,255,150,0.15);
+
+            color: #7CFFB2;
+        }
+
+        .pending {
+            background:
+                rgba(255,200,70,0.15);
+
+            color: #ffd36a;
+        }
+
+        .failed {
+            background:
+                rgba(255,70,70,0.15);
+
+            color: #ff8c8c;
+        }
+
+        .payment-info {
+            margin: 9px 0;
+
+            color: #ddd;
+
+            word-break: break-word;
+        }
+
+        .payment-info strong {
+            color: white;
+        }
+
+        .no-payments {
+            text-align: center;
+
+            padding: 40px;
+
+            border-radius: 20px;
+
+            background:
+                rgba(255,255,255,0.08);
+
+            color: #ccc;
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 20px;
+            }
+
+            .payment-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="title">
+        DEEDI ADMIN
+    </div>
+
+    <a href="/admin/users" class="back">
+        ← Users
+    </a>
+
+</header>
+
+
+<div class="container">
+
+
+    <!-- USER SUMMARY -->
+
+    <div class="user-card">
+
+        <div class="user-name">
+
+            👤
+            <span th:text="${user.name}">
+                User
+            </span>
+
+        </div>
+
+
+        <div class="info-grid">
+
+
+            <!-- AGE -->
+
+            <div class="info-box">
+
+                <div class="info-label">
+                    Age
+                </div>
+
+                <div class="info-value"
+                     th:text="${user.age}">
+                    20
+                </div>
+
+            </div>
+
+
+            <!-- JOINED -->
+
+            <div class="info-box">
+
+                <div class="info-label">
+                    Joined
+                </div>
+
+                <div class="info-value"
+                     th:text="${user.createdAt != null
+                        ? #temporals.format(
+                            user.createdAt,
+                            'dd MMM yyyy, hh:mm a'
+                          )
+                        : 'Before tracking'}">
+
+                    Before tracking
+
+                </div>
+
+            </div>
+
+
+            <!-- CURRENT COINS -->
+
+            <div class="info-box">
+
+                <div class="info-label">
+                    Current Coins
+                </div>
+
+                <div class="info-value"
+                     th:text="${user.coins}">
+                    0
+                </div>
+
+            </div>
+
+
+            <!-- TOTAL PAID -->
+
+            <div class="info-box">
+
+                <div class="info-label">
+                    Total Paid
+                </div>
+
+                <div class="info-value">
+
+                    ₹<span th:text="${totalPaid}">
+                        0
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- PAYMENT STATUS -->
+
+            <div class="info-box">
+
+                <div class="info-label">
+                    Payment Status
+                </div>
+
+                <div class="info-value"
+                     th:classappend="${hasPaid ? 'paid' : 'unpaid'}"
+                     th:text="${hasPaid ? 'PAID' : 'NOT PAID'}">
+
+                    NOT PAID
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- PAYMENT HISTORY -->
+
+    <div class="section-title">
+
+        💰 Payment History
+
+    </div>
+
+
+    <!-- PAYMENTS -->
+
+    <div th:if="${!payments.isEmpty()}">
+
+        <div class="payment-card"
+             th:each="payment : ${payments}">
+
+
+            <div class="payment-top">
+
+
+                <div class="amount">
+
+                    ₹<span th:text="${payment.amount}">
+                        199
+                    </span>
+
+                </div>
+
+
+                <div class="status"
+                     th:classappend="${
+                        payment.status != null
+                        and payment.status.equalsIgnoreCase('SUCCESS')
+                        ? 'success'
+                        : payment.status != null
+                        and payment.status.equalsIgnoreCase('PENDING')
+                        ? 'pending'
+                        : 'failed'
+                     }"
+                     th:text="${payment.status}">
+
+                    SUCCESS
+
+                </div>
+
+            </div>
+
+
+            <div class="payment-info">
+
+                🪙 Coins Purchased:
+
+                <strong th:text="${payment.coins}">
+                    5000
+                </strong>
+
+            </div>
+
+
+            <div class="payment-info">
+
+                📅 Payment Date:
+
+                <strong
+                    th:text="${payment.createdAt != null
+                        ? #temporals.format(
+                            payment.createdAt,
+                            'dd MMM yyyy, hh:mm a'
+                          )
+                        : 'Unknown'}">
+
+                    Unknown
+
+                </strong>
+
+            </div>
+
+
+            <div class="payment-info">
+
+                🧾 Cashfree Order ID:
+
+                <strong th:text="${payment.orderId}">
+                    ORDER_ID
+                </strong>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- NO PAYMENTS -->
+
+    <div class="no-payments"
+         th:if="${payments.isEmpty()}">
+
+        💳 This user has not made any payments yet.
+
+    </div>
+
+
+</div>
+
+</body>
+
+</html>

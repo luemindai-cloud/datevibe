@@ -1,0 +1,616 @@
+<div th:fragment="rechargePopup">
+
+    <!-- DARK OVERLAY -->
+    <div id="rechargeOverlay" class="recharge-overlay">
+
+        <!-- POPUP -->
+        <div class="recharge-popup">
+
+            <!-- CLOSE -->
+            <button class="recharge-close"
+                    onclick="closeRechargePopup()">
+                ✕
+            </button>
+
+      	<div class="recharge-avatar">
+    		<span>👩</span>
+		</div>
+
+            <div class="recharge-title">
+                ✨ Recharge to continue
+            </div>
+
+     	<div class="recharge-subtitle">
+
+    		Get more coins and continue chatting with
+    		<strong id="rechargeProfileName">your Companion</strong> 💗
+
+		</div>
+
+            <!-- CURRENT BALANCE -->
+            <div class="current-balance">
+                🪙
+                <span>Your Balance:</span>
+                <strong id="popupCoinBalance">0</strong>
+                Coins
+            </div>
+
+            <!-- PACKAGES -->
+            <div class="coin-packages">
+
+                <div class="coin-package"
+                     onclick="selectCoinPackage(this, 100, 3000)">
+
+                    <div class="package-coins">
+                        🪙 3,000
+                    </div>
+
+                    <div class="package-price">
+                        ₹100
+                    </div>
+
+                </div>
+
+
+                <div class="coin-package"
+                     onclick="selectCoinPackage(this, 199, 5000)">
+
+                    <div class="package-coins">
+                        🪙 5,000
+                    </div>
+
+                    <div class="package-price">
+                        ₹199
+                    </div>
+
+                </div>
+
+
+                <div class="coin-package"
+                     onclick="selectCoinPackage(this, 399, 10000)">
+
+                    <div class="package-coins">
+                        🪙 10,000
+                    </div>
+
+                    <div class="package-price">
+                        ₹399
+                    </div>
+
+                </div>
+
+
+                <div class="coin-package popular-package"
+                     onclick="selectCoinPackage(this, 1599, 50000)">
+
+                    <div class="popular-badge">
+                        BEST VALUE
+                    </div>
+
+                    <div class="package-coins">
+                        🪙 50,000
+                    </div>
+
+                    <div class="package-price">
+                        ₹1,599
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- SELECTED PACKAGE -->
+            <div id="selectedPackage"
+                 class="selected-package">
+
+                Select a coin package
+            </div>
+
+            <!-- RECHARGE BUTTON -->
+            <button id="rechargeButton"
+                    class="recharge-button"
+                    onclick="startRecharge()">
+
+                💳 RECHARGE NOW
+            </button>
+
+            <div class="secure-text">
+                🔒 Secure payment
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <style>
+
+        .recharge-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 5, 20, 0.78);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+
+            display: none;
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+
+            z-index: 99999;
+
+            animation: fadeIn 0.25s ease;
+        }
+
+
+        .recharge-overlay.show {
+            display: flex;
+        }
+
+
+        .recharge-popup {
+            width: 100%;
+            max-width: 420px;
+
+            background: linear-gradient(
+                145deg,
+                #ffffff,
+                #fff5fa
+            );
+
+            border-radius: 28px;
+
+            padding: 28px 20px 22px;
+
+            position: relative;
+
+            box-shadow:
+                0 25px 70px rgba(0,0,0,0.35),
+                0 0 35px rgba(255,105,180,0.25);
+
+            text-align: center;
+
+            animation: popupIn 0.35s ease;
+        }
+
+
+        .recharge-close {
+            position: absolute;
+
+            right: 14px;
+            top: 14px;
+
+            width: 34px;
+            height: 34px;
+
+            border: none;
+            border-radius: 50%;
+
+            background: #fff0f7;
+
+            color: #e91e63;
+
+            font-size: 17px;
+
+            cursor: pointer;
+        }
+
+
+        .recharge-avatar {
+            width: 76px;
+            height: 76px;
+
+            margin: 0 auto 12px;
+
+            border-radius: 50%;
+
+            overflow: hidden;
+
+            border: 4px solid #ffd84d;
+
+            box-shadow:
+                0 0 20px rgba(255,216,77,0.5);
+        }
+
+
+        .recharge-avatar img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+
+        .recharge-avatar span {
+            display: flex;
+
+            width: 100%;
+            height: 100%;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 38px;
+        }
+
+
+        .recharge-title {
+            font-size: 24px;
+
+            font-weight: 800;
+
+            color: #e91e63;
+
+            margin-bottom: 7px;
+        }
+
+
+        .recharge-subtitle {
+            font-size: 14px;
+
+            color: #777;
+
+            line-height: 1.5;
+
+            margin-bottom: 18px;
+        }
+
+
+        .recharge-subtitle strong {
+            color: #e91e63;
+        }
+
+
+        .current-balance {
+            background: #fff3a6;
+
+            border-radius: 15px;
+
+            padding: 12px;
+
+            margin-bottom: 18px;
+
+            color: #6d5900;
+
+            font-size: 14px;
+        }
+
+
+        .current-balance strong {
+            font-size: 20px;
+
+            color: #e91e63;
+
+            margin: 0 4px;
+        }
+
+
+        .coin-packages {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 12px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .coin-package {
+            background: white;
+
+            border: 2px solid #f3dce7;
+
+            border-radius: 18px;
+
+            padding: 16px 8px;
+
+            cursor: pointer;
+
+            position: relative;
+
+            transition: 0.25s;
+        }
+
+
+        .coin-package:hover {
+            transform: translateY(-3px);
+
+            border-color: #ff69a8;
+
+            box-shadow:
+                0 8px 20px rgba(255,105,168,0.18);
+        }
+
+
+        .coin-package.selected {
+            border-color: #e91e63;
+
+            background: #fff0f7;
+
+            box-shadow:
+                0 0 0 3px rgba(233,30,99,0.10);
+        }
+
+
+        .package-coins {
+            font-size: 18px;
+
+            font-weight: 800;
+
+            color: #e91e63;
+        }
+
+
+        .package-price {
+            margin-top: 5px;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            color: #555;
+        }
+
+
+        .popular-package {
+            border-color: #ffd84d;
+        }
+
+
+        .popular-badge {
+            position: absolute;
+
+            top: -10px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            background: #ffd84d;
+
+            color: #604f00;
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            padding: 4px 9px;
+
+            border-radius: 20px;
+
+            white-space: nowrap;
+        }
+
+
+        .selected-package {
+            min-height: 20px;
+
+            margin: 5px 0 12px;
+
+            font-size: 13px;
+
+            color: #888;
+        }
+
+
+        .recharge-button {
+            width: 100%;
+
+            border: none;
+
+            border-radius: 16px;
+
+            padding: 15px;
+
+            background: linear-gradient(
+                135deg,
+                #e91e63,
+                #ff69a8
+            );
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 10px 25px rgba(233,30,99,0.25);
+
+            transition: 0.25s;
+        }
+
+
+        .recharge-button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 14px 30px rgba(233,30,99,0.35);
+        }
+
+
+        .secure-text {
+            margin-top: 12px;
+
+            font-size: 11px;
+
+            color: #999;
+        }
+
+
+        @keyframes popupIn {
+
+            from {
+                opacity: 0;
+                transform: scale(0.85) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+
+        }
+
+
+        @keyframes fadeIn {
+
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+
+        }
+
+
+        @media (max-width: 380px) {
+
+            .recharge-popup {
+                padding: 24px 15px 18px;
+            }
+
+            .package-coins {
+                font-size: 16px;
+            }
+
+        }
+
+    </style>
+
+
+    <script>
+
+        let selectedPrice = 0;
+        let selectedCoins = 0;
+
+
+        function openRechargePopup() {
+
+            document
+                .getElementById("rechargeOverlay")
+                .classList.add("show");
+
+        }
+
+
+        function closeRechargePopup() {
+
+            document
+                .getElementById("rechargeOverlay")
+                .classList.remove("show");
+
+        }
+
+
+        function selectCoinPackage(element, price, coins) {
+
+            document
+                .querySelectorAll(".coin-package")
+                .forEach(function(packageElement) {
+
+                    packageElement.classList.remove("selected");
+
+                });
+
+
+            element.classList.add("selected");
+
+            selectedPrice = price;
+            selectedCoins = coins;
+
+
+            document.getElementById("selectedPackage").innerText =
+                "Selected: ₹" + price + " → " + coins.toLocaleString() + " Coins";
+
+        }
+
+
+        async function startRecharge() {
+
+            console.log("🔥 RECHARGE NOW clicked");
+            console.log("Selected price:", selectedPrice);
+            console.log("Selected coins:", selectedCoins);
+
+            if (selectedPrice === 0) {
+                alert("Please select a coin package.");
+                return;
+            }
+
+            try {
+
+                // 1️⃣ Create payment order on our server
+                const response = await fetch(
+                    "/api/payment/create?packageId=" + selectedPrice,
+                    {
+                        method: "POST"
+                    }
+                );
+
+                console.log("Backend status:", response.status);
+
+                const data = await response.json();
+
+                console.log("Backend response:", data);
+
+                if (!response.ok) {
+
+                    alert(
+                        data.error ||
+                        "Unable to create payment."
+                    );
+
+                    return;
+                }
+
+                if (!data.paymentSessionId) {
+
+                    console.error(
+                        "Payment session missing:",
+                        data
+                    );
+
+                    alert(
+                        "Cashfree payment session was not received."
+                    );
+
+                    return;
+                }
+
+                console.log(
+                    "Opening Cashfree checkout 🚀"
+                );
+
+                // 2️⃣ Open Cashfree Sandbox Checkout
+                const cashfree = Cashfree({
+                    mode: "sandbox"
+                });
+
+                cashfree.checkout({
+                    paymentSessionId: data.paymentSessionId
+                });
+
+            } catch (error) {
+
+                console.error(
+                    "Payment error:",
+                    error
+                );
+
+                alert(
+                    "Unable to open Cashfree payment."
+                );
+            }
+        }
+            
+      
+        
+
+    </script>
+
+</div>

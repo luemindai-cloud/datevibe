@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	
+	<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+	
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Home | AI Video Chat</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(255, 105, 180, 0.18),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 90% 90%,
+                    rgba(255, 220, 80, 0.12),
+                    transparent 28%
+                ),
+                #fff8fc;
+
+            color: #3a2030;
+        }
+
+        /* HEADER */
+
+        .header {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 10;
+
+            height: 70px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 22px;
+
+            background: rgba(255,255,255,0.85);
+
+            backdrop-filter: blur(15px);
+
+            border-bottom: 1px solid #f8d5e5;
+        }
+
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            font-size: 18px;
+
+            font-weight: 800;
+
+            color: #e83f89;
+        }
+
+        .brand-icon {
+
+            font-size: 25px;
+        }
+
+        /* COINS */
+
+        .coin-box {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding: 9px 13px;
+
+            border-radius: 20px;
+
+            background: #fff4bd;
+
+            color: #806500;
+
+            font-size: 13px;
+
+            font-weight: 800;
+
+            box-shadow:
+                0 5px 15px rgba(255, 210, 70, 0.15);
+        }
+
+        /* MAIN */
+
+        .main {
+
+            width: min(100%, 1100px);
+
+            margin: auto;
+
+            padding: 28px 18px 50px;
+        }
+
+        .welcome {
+
+            margin-bottom: 25px;
+
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome h1 {
+
+            font-size: clamp(26px, 6vw, 36px);
+
+            color: #e83f89;
+
+            margin-bottom: 6px;
+        }
+
+        .welcome p {
+
+            color: #856579;
+
+            font-size: 14px;
+
+            line-height: 1.5;
+        }
+
+        .section-title {
+
+            font-size: 18px;
+
+            font-weight: 800;
+
+            margin-bottom: 16px;
+
+            color: #4b293a;
+        }
+
+        /* PROFILE GRID */
+
+        .profiles {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fill, minmax(220px, 1fr));
+
+            gap: 18px;
+        }
+
+        /* PROFILE CARD */
+
+        .profile-card {
+
+            background: rgba(255,255,255,0.88);
+
+            border: 1px solid #f6d4e4;
+
+            border-radius: 24px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 10px 30px rgba(232, 63, 137, 0.08);
+
+            transition: 0.3s;
+
+            animation: cardAppear 0.7s ease both;
+        }
+
+        @keyframes cardAppear {
+
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-card:hover {
+
+            transform: translateY(-6px);
+
+            box-shadow:
+                0 18px 40px rgba(232, 63, 137, 0.16);
+        }
+
+        /* IMAGE PLACEHOLDER */
+
+        .profile-image {
+
+            height: 245px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffd6e8,
+                    #fff1f7
+                );
+
+            font-size: 80px;
+
+            position: relative;
+        }
+        
+        
+        .profile-image img {
+    	width: 100%;
+    	height: 100%;
+    	object-fit: cover;
+    	display: block;
+		}
+
+        .online {
+
+            position: absolute;
+
+            top: 13px;
+
+            right: 13px;
+
+            padding: 5px 9px;
+
+            border-radius: 15px;
+
+            background: #fff;
+
+            color: #2e9b62;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            box-shadow:
+                0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* PROFILE DETAILS */
+
+        .profile-info {
+
+            padding: 17px;
+        }
+
+        .profile-name {
+
+            font-size: 20px;
+
+            font-weight: 800;
+
+            color: #3a2030;
+        }
+
+        .profile-age {
+
+            color: #a1778d;
+
+            font-size: 12px;
+
+            margin-left: 5px;
+        }
+
+        .profile-description {
+
+            margin-top: 7px;
+
+            color: #856579;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+
+            min-height: 40px;
+        }
+
+        /* CHAT BUTTON */
+
+        .chat-btn {
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            width: 100%;
+
+            height: 48px;
+
+            margin-top: 14px;
+
+            border-radius: 15px;
+
+            text-decoration: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff3f91,
+                    #ff78b4
+                );
+
+            color: white;
+
+            font-size: 14px;
+
+            font-weight: 800;
+
+            box-shadow:
+                0 8px 20px rgba(255, 63, 145, 0.20);
+
+            transition: 0.25s;
+        }
+
+        .chat-btn:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 12px 25px rgba(255, 63, 145, 0.30);
+        }
+
+        /* BOTTOM NAV */
+
+        .bottom-nav {
+
+            position: fixed;
+
+            bottom: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 65px;
+
+            display: flex;
+
+            justify-content: space-around;
+
+            align-items: center;
+
+            background: rgba(255,255,255,0.92);
+
+            backdrop-filter: blur(18px);
+
+            border-top: 1px solid #f4d3e1;
+
+            z-index: 20;
+        }
+
+        .nav-item {
+
+            text-align: center;
+
+            color: #a1778d;
+
+            font-size: 11px;
+
+            text-decoration: none;
+
+            font-weight: 600;
+        }
+
+        .nav-icon {
+
+            display: block;
+
+            font-size: 21px;
+
+            margin-bottom: 2px;
+        }
+
+        .nav-item.active {
+
+            color: #e83f89;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 600px) {
+
+            .header {
+
+                height: 64px;
+
+                padding: 0 15px;
+            }
+
+            .brand {
+
+                font-size: 16px;
+            }
+
+            .main {
+
+                padding: 24px 14px 90px;
+            }
+
+            .profiles {
+
+                grid-template-columns: repeat(2, 1fr);
+
+                gap: 12px;
+            }
+
+            .profile-image {
+
+                height: 190px;
+
+                font-size: 60px;
+            }
+
+            .profile-info {
+
+                padding: 13px;
+            }
+
+            .profile-name {
+
+                font-size: 16px;
+            }
+
+            .profile-description {
+
+                font-size: 11px;
+            }
+
+            .chat-btn {
+
+                height: 43px;
+
+                font-size: 12px;
+            }
+
+        }
+
+        @media (max-width: 360px) {
+
+            .profiles {
+
+                grid-template-columns: 1fr;
+            }
+
+            .profile-image {
+
+                height: 240px;
+            }
+            
+            .profile-image img {
+
+    		width: 100%;
+  			height: 100%;
+
+    		object-fit: cover;
+
+    		display: block;
+			}
+        }
+        
+        
+        /* ============================= */
+/* INCOMING AI CALL POPUP */
+/* ============================= */
+
+.incoming-call-overlay {
+    display: none;
+
+    position: fixed;
+    inset: 0;
+
+    background: rgba(45, 10, 30, 0.55);
+
+    backdrop-filter: blur(12px);
+
+    z-index: 1000;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.incoming-call-overlay.show {
+    display: flex;
+}
+
+.incoming-call {
+    width: min(100%, 360px);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.97),
+            rgba(255,244,250,0.97)
+        );
+
+    border: 1px solid #f5cddd;
+
+    border-radius: 30px;
+
+    padding: 28px 22px;
+
+    text-align: center;
+
+    box-shadow:
+        0 25px 70px rgba(232,63,137,0.30);
+
+    animation: incomingCallAppear 0.45s ease;
+}
+
+@keyframes incomingCallAppear {
+
+    from {
+        opacity: 0;
+        transform: scale(0.82) translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.incoming-call-title {
+    color: #e83f89;
+
+    font-size: 20px;
+
+    font-weight: 900;
+
+    margin-bottom: 18px;
+}
+
+.incoming-avatar {
+    width: 105px;
+    height: 105px;
+
+    margin: 0 auto 14px;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    border: 4px solid #ffd2e5;
+
+    box-shadow:
+        0 10px 30px rgba(232,63,137,0.20);
+
+    animation: avatarPulse 1.5s infinite;
+}
+
+.incoming-avatar img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+@keyframes avatarPulse {
+
+    0%, 100% {
+        transform: scale(1);
+        box-shadow:
+            0 10px 30px rgba(232,63,137,0.20);
+    }
+
+    50% {
+        transform: scale(1.06);
+        box-shadow:
+            0 10px 40px rgba(232,63,137,0.40);
+    }
+}
+
+.incoming-name {
+    font-size: 25px;
+
+    font-weight: 900;
+
+    color: #3a2030;
+
+    margin-bottom: 4px;
+}
+
+.incoming-subtitle {
+    color: #856579;
+
+    font-size: 13px;
+
+    margin-bottom: 20px;
+}
+
+.ringing-text {
+    color: #e83f89;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    margin-bottom: 22px;
+
+    animation: ringingText 1s infinite;
+}
+
+@keyframes ringingText {
+
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.45;
+    }
+}
+
+.call-actions {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+}
+
+.call-action-btn {
+    height: 52px;
+
+    border: none;
+
+    border-radius: 16px;
+
+    font-size: 13px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.call-action-btn:hover {
+    transform: translateY(-2px);
+}
+
+.decline-call {
+    background: #ffe7ef;
+
+    color: #d7357b;
+}
+
+.accept-call {
+    background:
+        linear-gradient(
+            135deg,
+            #ff3f91,
+            #ff78b4
+        );
+
+    color: white;
+
+    box-shadow:
+        0 8px 20px rgba(255,63,145,0.25);
+}
+
+.ai-call-disclosure {
+    margin-top: 17px;
+
+    font-size: 10px;
+
+    color: #a1778d;
+
+    line-height: 1.4;
+}
+
+/* ============================= */
+/* FLOATING SPIN & WIN */
+/* ============================= */
+
+.spin-floating-btn {
+    position: fixed !important;
+
+    right: 18px !important;
+    bottom: 82px !important;
+
+    width: 72px;
+    height: 72px;
+
+    border: 3px solid #ffd84d;
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ff3f91,
+            #ff78b4
+        );
+
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 3px;
+
+    font-size: 25px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 25px rgba(232,63,137,0.35);
+
+    z-index: 900;
+
+    animation: spinFloatPulse 2s infinite;
+
+    padding: 0;
+}
+
+.spin-floating-btn span {
+    font-size: 9px;
+    font-weight: 900;
+}
+
+@keyframes spinFloatPulse {
+
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+
+/* ============================= */
+/* SPIN MODAL */
+/* ============================= */
+
+.spin-modal-overlay {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(35, 5, 25, 0.70);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    z-index: 5000;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px;
+}
+
+.spin-modal-overlay.show {
+    display: flex;
+}
+
+.spin-modal {
+
+    width: min(100%, 400px);
+
+    max-height: 92vh;
+
+    overflow-y: auto;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #fff4fa
+        );
+
+    border: 1px solid #f5cddd;
+
+    border-radius: 30px;
+
+    padding: 22px 16px;
+
+    text-align: center;
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,0.35),
+        0 0 35px rgba(232,63,137,0.25);
+
+    animation: spinModalIn 0.35s ease;
+}
+
+@keyframes spinModalIn {
+
+    from {
+        opacity: 0;
+        transform: scale(0.75) translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+
+.spin-modal-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+}
+
+.spin-modal-title {
+
+    color: #e83f89;
+
+    font-size: 21px;
+
+    font-weight: 900;
+}
+
+.spin-close {
+
+    width: 35px;
+    height: 35px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #ffe8f2;
+
+    color: #d7357b;
+
+    font-size: 18px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+/* ============================= */
+/* BIG WHEEL */
+/* ============================= */
+
+.spin-wheel-wrapper {
+
+    position: relative;
+
+    width: min(82vw, 330px);
+    height: min(82vw, 330px);
+
+    margin: 8px auto 18px;
+}
+
+#wheelCanvas {
+
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    border-radius: 50%;
+
+    filter:
+        drop-shadow(
+            0 12px 25px
+            rgba(232,63,137,0.25)
+        );
+
+    transition:
+        transform 5s
+        cubic-bezier(
+            0.15,
+            0.85,
+            0.15,
+            1
+        );
+}
+
+.wheel-pointer {
+
+    position: absolute;
+
+    top: -5px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    width: 0;
+    height: 0;
+
+    border-left:
+        16px solid transparent;
+
+    border-right:
+        16px solid transparent;
+
+    border-top:
+        34px solid #e83f89;
+
+    z-index: 10;
+
+    filter:
+        drop-shadow(
+            0 4px 5px
+            rgba(0,0,0,0.20)
+        );
+}
+
+.wheel-center {
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    width: 62px;
+    height: 62px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #fff4fa
+        );
+
+    border: 5px solid #ffd84d;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 23px;
+
+    box-shadow:
+        0 5px 20px
+        rgba(0,0,0,0.16);
+
+    z-index: 8;
+}
+
+
+/* ============================= */
+/* FREE SPIN */
+/* ============================= */
+
+.spin-free-badge {
+
+    display: none;
+
+    width: fit-content;
+
+    margin: 0 auto 10px;
+
+    padding: 7px 13px;
+
+    border-radius: 20px;
+
+    background: #fff3a6;
+
+    color: #6d5900;
+
+    font-size: 11px;
+
+    font-weight: 900;
+}
+
+.spin-free-badge.show {
+    display: block;
+}
+
+
+/* ============================= */
+/* SPIN ACTION */
+/* ============================= */
+
+.spin-action-btn {
+
+    width: 100%;
+
+    max-width: 300px;
+
+    height: 52px;
+
+    border: none;
+
+    border-radius: 17px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e91e63,
+            #ff69a8
+        );
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 25px
+        rgba(233,30,99,0.25);
+}
+
+.spin-action-btn:disabled {
+
+    opacity: 0.55;
+
+    cursor: not-allowed;
+}
+
+.spin-cost-text {
+
+    margin-top: 8px;
+
+    color: #9a7185;
+
+    font-size: 11px;
+}
+
+.spin-result {
+
+    min-height: 24px;
+
+    margin-top: 13px;
+
+    color: #e83f89;
+
+    font-size: 14px;
+
+    font-weight: 900;
+}
+
+
+    </style>
+
+</head>
+
+<body>
+
+
+<header class="header">
+
+    <div class="brand">
+
+        <img src="/static/images/logo.jpeg" 
+             alt="DateVibe" 
+             style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px;">
+
+        <span>DateVibe</span>
+
+    </div>
+
+
+    <div class="coin-box">
+    🪙 <span id="homeCoinBalance">0</span>
+	</div>
+
+</header>
+
+
+
+<main class="main">
+
+
+    <section class="welcome">
+
+        <h1>
+            Hello, <span th:text="${name}">Mich</span> 👋
+        </h1>
+
+        <p>
+            Discover someone you would like to talk to today.
+        </p>
+
+    </section>
+
+
+    <h2 class="section-title">
+        ✨ best matches for you
+    </h2>
+
+
+    <section class="profiles">
+
+    <article class="profile-card"
+             th:each="profile : ${profiles}">
+
+        <div class="profile-image">
+
+        <img th:src="@{'/api/image/' + ${profile.profileImage}}"
+     th:alt="${profile.name}"
+     onerror="this.parentElement.innerHTML='👩'">
+
+            <span class="online"
+                  th:if="${profile.online}">
+                🟢 Online
+            </span>
+
+            <span class="online"
+                  th:unless="${profile.online}">
+                ⚪ Offline
+            </span>
+
+        </div>
+
+        <div class="profile-info">
+
+            <div class="profile-name">
+
+                <span th:text="${profile.name}">
+                    Sofia
+                </span>
+
+                <span class="profile-age"
+                      th:text="${profile.age}">
+                    24
+                </span>
+
+            </div>
+
+            <p class="profile-description"
+               th:text="${profile.description}">
+
+                Sweet, friendly and loves
+                interesting conversations.
+
+            </p>
+
+           <a th:href="@{'/profile/' + ${profile.id}}"
+   			class="chat-btn">
+
+    		💬 CHAT
+
+			</a>
+
+        </div>
+
+    </article>
+
+</section>
+</main>
+
+	<!-- RECHARGE POPUP -->
+
+<div th:replace="~{fragments/recharge-popup :: rechargePopup}"></div>
+
+	<!-- INCOMING AI VIDEO CALL -->
+
+<div id="incomingCallOverlay"
+     class="incoming-call-overlay">
+
+    <div class="incoming-call">
+
+        <div class="incoming-call-title">
+            📞 Incoming Video Call
+        </div>
+
+        <div class="incoming-avatar">
+
+            <img id="incomingCallImage"
+                 src=""
+                 alt="AI Companion">
+
+        </div>
+
+        <div id="incomingCallName"
+             class="incoming-name">
+            Sofia
+        </div>
+
+        <div class="incoming-subtitle">
+            ✨ Your companion
+        </div>
+
+        <div class="ringing-text">
+            🔔 Calling you...
+        </div>
+
+        <div class="call-actions">
+
+            <button class="call-action-btn decline-call"
+                    onclick="declineIncomingCall()">
+
+                ❌ DECLINE
+
+            </button>
+
+            <button class="call-action-btn accept-call"
+                    onclick="acceptIncomingCall()">
+
+                📹 ACCEPT
+
+            </button>
+
+        </div>
+
+        <div class="ai-call-disclosure">
+
+            experience real time video call with your companion
+
+        </div>
+
+    </div>
+
+</div>
+
+		<!-- ============================= -->
+<!-- FLOATING SPIN BUTTON -->
+<!-- ============================= -->
+
+<button class="spin-floating-btn"
+        onclick="openSpinWheel()">
+
+    🎡
+    <span>SPIN & WIN</span>
+
+</button>
+
+
+<!-- ============================= -->
+<!-- SPIN WHEEL MODAL -->
+<!-- ============================= -->
+
+<div id="spinModalOverlay"
+     class="spin-modal-overlay">
+
+    <div class="spin-modal">
+
+        <div class="spin-modal-header">
+
+            <div class="spin-modal-title">
+                🎡 Spin & Win
+            </div>
+
+            <button class="spin-close"
+                    onclick="closeSpinWheel()">
+
+                ✕
+
+            </button>
+
+        </div>
+
+        <div id="spinFreeBadge"
+             class="spin-free-badge">
+
+            🎁 FREE SPIN AVAILABLE
+
+        </div>
+
+        <div class="spin-wheel-wrapper">
+
+            <div class="wheel-pointer"></div>
+
+            <canvas id="wheelCanvas"
+                    width="600"
+                    height="600">
+            </canvas>
+
+            <div class="wheel-center">
+                🎡
+            </div>
+
+        </div>
+
+        <button id="spinActionButton"
+                class="spin-action-btn"
+                onclick="spinWheel()">
+
+            🎡 SPIN — 100 🪙
+
+        </button>
+
+        <div class="spin-cost-text">
+            One spin costs 100 coins
+        </div>
+
+        <div id="spinResult"
+             class="spin-result">
+        </div>
+
+    </div>
+
+</div>
+
+<nav class="bottom-nav">
+
+    <!-- HOME -->
+    <a href="/" class="nav-item active">
+        <span class="nav-icon">🏠</span>
+        Home
+    </a>
+
+    <!-- CHATS -->
+    <a href="/chats" class="nav-item">
+        <span class="nav-icon">💬</span>
+        Chats
+    </a>
+
+    <!-- COINS -->
+    <a href="/coins" class="nav-item">
+        <span class="nav-icon">🪙</span>
+        Coins
+    </a>
+
+    <!-- PROFILE -->
+    <a href="/user-profile" class="nav-item">
+        <span class="nav-icon">👤</span>
+        Profile
+    </a>
+
+</nav>
+
+	<script>
+
+async function loadHomeCoins() {
+
+    try {
+
+        const response =
+            await fetch("/api/user/coins");
+
+        const data =
+            await response.json();
+
+        console.log("🪙 Home coin balance:", data);
+
+        if (data.loggedIn) {
+
+            const coinElement =
+                document.getElementById(
+                    "homeCoinBalance"
+                );
+
+            if (coinElement) {
+
+                coinElement.innerText =
+                    data.coins.toLocaleString();
+            }
+        }
+
+    } catch (error) {
+
+        console.error(
+            "❌ Failed to load home coins:",
+            error
+        );
+    }
+}
+
+loadHomeCoins();
+
+/* ================================= */
+/* RANDOM INCOMING AI VIDEO CALL */
+/* ================================= */
+
+let incomingCaller = null;
+
+let incomingCallTimer = null;
+
+
+/* START RANDOM CALL */
+
+function scheduleIncomingCall() {
+
+    // Random delay between 15 and 30 seconds
+    const delay =
+        Math.floor(
+            Math.random() * 15000
+        ) + 15000;
+
+    console.log(
+        "📞 Incoming call scheduled in:",
+        Math.round(delay / 1000),
+        "seconds"
+    );
+
+    incomingCallTimer =
+        setTimeout(
+            showIncomingCall,
+            delay
+        );
+}
+
+
+/* SHOW INCOMING CALL */
+
+function showIncomingCall() {
+
+    const profileCards =
+        document.querySelectorAll(".profile-card");
+
+    if (!profileCards.length) {
+        console.log(
+            "No AI profiles available."
+        );
+        return;
+    }
+
+
+    // Pick random profile
+    const randomIndex =
+        Math.floor(
+            Math.random() *
+            profileCards.length
+        );
+
+    const card =
+        profileCards[randomIndex];
+
+
+    const nameElement =
+        card.querySelector(".profile-name span");
+
+    const imageElement =
+        card.querySelector(".profile-image img");
+
+
+    if (!nameElement || !imageElement) {
+        return;
+    }
+
+
+    // Get profile information
+    const name =
+        nameElement.innerText.trim();
+
+    const image =
+        imageElement.src;
+
+
+    // Get profile ID from chat link
+    const chatLink =
+        card.querySelector(".chat-btn");
+
+    let profileId = null;
+
+    if (chatLink) {
+
+        const href =
+            chatLink.getAttribute("href");
+
+        if (href) {
+
+            const parts =
+                href.split("/");
+
+            profileId =
+                parts[parts.length - 1];
+
+        }
+
+    }
+
+
+    incomingCaller = {
+
+        name: name,
+
+        image: image,
+
+        profileId: profileId
+
+    };
+
+
+    // Update popup
+    document.getElementById(
+        "incomingCallName"
+    ).innerText = name;
+
+
+    document.getElementById(
+        "incomingCallImage"
+    ).src = image;
+
+
+    // Show popup
+    document.getElementById(
+        "incomingCallOverlay"
+    ).classList.add("show");
+
+
+    // Start ringing
+    startIncomingRinging();
+
+
+    console.log(
+        "📞 Incoming call from:",
+        incomingCaller
+    );
+}
+
+
+/* ================================= */
+/* INCOMING CALL RINGING */
+/* ================================= */
+
+let ringingContext = null;
+let ringingTimer = null;
+
+
+/* START RINGING */
+
+function startIncomingRinging() {
+
+    stopIncomingRinging();
+
+    try {
+
+        ringingContext =
+            new (window.AudioContext ||
+                 window.webkitAudioContext)();
+
+        const playRing = () => {
+
+            if (!ringingContext) {
+                return;
+            }
+
+            const oscillator =
+                ringingContext.createOscillator();
+
+            const gain =
+                ringingContext.createGain();
+
+            oscillator.type = "sine";
+
+            oscillator.frequency.setValueAtTime(
+                880,
+                ringingContext.currentTime
+            );
+
+            oscillator.frequency.setValueAtTime(
+                660,
+                ringingContext.currentTime + 0.25
+            );
+
+            gain.gain.setValueAtTime(
+                0.0001,
+                ringingContext.currentTime
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.25,
+                ringingContext.currentTime + 0.02
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.0001,
+                ringingContext.currentTime + 0.5
+            );
+
+            oscillator.connect(gain);
+
+            gain.connect(
+                ringingContext.destination
+            );
+
+            oscillator.start();
+
+            oscillator.stop(
+                ringingContext.currentTime + 0.5
+            );
+        };
+
+
+        playRing();
+
+
+        ringingTimer =
+            setInterval(
+                playRing,
+                1200
+            );
+
+    } catch (error) {
+
+        console.error(
+            "❌ Ringing error:",
+            error
+        );
+
+    }
+}
+
+
+/* STOP RINGING */
+
+function stopIncomingRinging() {
+
+    if (ringingTimer) {
+
+        clearInterval(ringingTimer);
+
+        ringingTimer = null;
+    }
+
+
+    if (ringingContext) {
+
+        ringingContext.close()
+            .catch(() => {});
+
+        ringingContext = null;
+    }
+}
+
+/* UNLOCK AUDIO AFTER USER INTERACTION */
+
+document.addEventListener(
+    "click",
+    async function unlockAudio() {
+
+        try {
+
+            const context =
+                new (window.AudioContext ||
+                     window.webkitAudioContext)();
+
+            await context.resume();
+
+            await context.close();
+
+        } catch (error) {
+
+            console.log(
+                "Audio unlock:",
+                error
+            );
+
+        }
+
+        document.removeEventListener(
+            "click",
+            unlockAudio
+        );
+
+    },
+    { once: true }
+);
+
+/* DECLINE */
+
+function declineIncomingCall() {
+
+    console.log(
+        "❌ Incoming call declined"
+    );
+
+
+    stopIncomingRinging();
+
+
+    document.getElementById(
+        "incomingCallOverlay"
+    ).classList.remove("show");
+
+
+    incomingCaller = null;
+
+
+    // Schedule another call later
+    scheduleIncomingCall();
+}
+
+/* ================================= */
+/* FLOATING SPIN & WIN */
+/* ================================= */
+
+const wheelCanvas =
+    document.getElementById("wheelCanvas");
+
+const wheelCtx =
+    wheelCanvas.getContext("2d");
+
+const wheelPrizes = [
+    "10,000",
+    "Better Luck",
+    "1,000",
+    "1 More Spin",
+    "10",
+    "Better Luck"
+];
+
+const wheelColors = [
+    "#ffd84d",
+    "#ffd6e8",
+    "#ff78b4",
+    "#fff3a6",
+    "#ffc4dc",
+    "#ffe7ef"
+];
+
+let wheelRotation = 0;
+let wheelSpinning = false;
+
+
+function drawSpinWheel() {
+
+    const size = wheelCanvas.width;
+    const center = size / 2;
+    const radius = size / 2 - 10;
+
+    const slice =
+        (Math.PI * 2) /
+        wheelPrizes.length;
+
+    wheelCtx.clearRect(
+        0,
+        0,
+        size,
+        size
+    );
+
+    wheelPrizes.forEach(
+        (prize, index) => {
+
+            const startAngle =
+                index * slice -
+                Math.PI / 2;
+
+            const endAngle =
+                startAngle + slice;
+
+            wheelCtx.beginPath();
+
+            wheelCtx.moveTo(
+                center,
+                center
+            );
+
+            wheelCtx.arc(
+                center,
+                center,
+                radius,
+                startAngle,
+                endAngle
+            );
+
+            wheelCtx.closePath();
+
+            wheelCtx.fillStyle =
+                wheelColors[index];
+
+            wheelCtx.fill();
+
+            wheelCtx.strokeStyle =
+                "#ffffff";
+
+            wheelCtx.lineWidth = 8;
+
+            wheelCtx.stroke();
+
+            wheelCtx.save();
+
+            wheelCtx.translate(
+                center,
+                center
+            );
+
+            wheelCtx.rotate(
+                startAngle + slice / 2
+            );
+
+            wheelCtx.textAlign =
+                "right";
+
+            wheelCtx.textBaseline =
+                "middle";
+
+            wheelCtx.fillStyle =
+                "#4b293a";
+
+            wheelCtx.font =
+                "900 25px Segoe UI";
+
+            wheelCtx.fillText(
+                prize,
+                radius - 28,
+                0
+            );
+
+            wheelCtx.restore();
+        }
+    );
+}
+
+
+drawSpinWheel();
+
+
+function openSpinWheel() {
+
+    document
+        .getElementById(
+            "spinModalOverlay"
+        )
+        .classList.add("show");
+
+}
+
+
+function closeSpinWheel() {
+
+    if (wheelSpinning) {
+        return;
+    }
+
+    document
+        .getElementById(
+            "spinModalOverlay"
+        )
+        .classList.remove("show");
+
+}
+
+
+async function spinWheel() {
+
+    if (wheelSpinning) {
+        return;
+    }
+
+    wheelSpinning = true;
+
+    const button =
+        document.getElementById(
+            "spinActionButton"
+        );
+
+    const result =
+        document.getElementById(
+            "spinResult"
+        );
+
+    const freeBadge =
+        document.getElementById(
+            "spinFreeBadge"
+        );
+
+    button.disabled = true;
+
+    result.innerText =
+        "🎡 Spinning...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/spin",
+                {
+                    method: "POST"
+                }
+            );
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "🎡 Spin response:",
+            data
+        );
+
+
+        /* ========================= */
+        /* NOT ENOUGH COINS */
+        /* ========================= */
+
+        if (
+            !data.success &&
+            data.notEnoughCoins
+        ) {
+
+            result.innerText = "";
+
+            button.disabled = false;
+
+            wheelSpinning = false;
+
+
+            const popupBalance =
+                document.getElementById(
+                    "popupCoinBalance"
+                );
+
+            if (popupBalance) {
+
+                popupBalance.innerText =
+                    data.coins.toLocaleString();
+
+            }
+
+
+            openRechargePopup();
+
+            return;
+        }
+
+
+        if (!data.success) {
+
+            result.innerText =
+                data.error ||
+                "Unable to spin.";
+
+            button.disabled = false;
+
+            wheelSpinning = false;
+
+            return;
+        }
+
+
+        /* ========================= */
+        /* UPDATE COINS */
+        /* ========================= */
+
+        const homeCoins =
+            document.getElementById(
+                "homeCoinBalance"
+            );
+
+        if (homeCoins) {
+
+            homeCoins.innerText =
+                data.coins.toLocaleString();
+
+        }
+
+
+        /* ========================= */
+        /* SERVER RESULT */
+        /* ========================= */
+
+        let targetIndex;
+
+
+        if (
+            data.result ===
+            "EXTRA_SPIN"
+        ) {
+
+            targetIndex = 3;
+
+        } else {
+
+            targetIndex = 1;
+
+        }
+
+
+        /* ========================= */
+        /* ROTATE */
+        /* ========================= */
+
+        const sliceAngle =
+            360 /
+            wheelPrizes.length;
+
+        const targetAngle =
+            targetIndex *
+            sliceAngle +
+            sliceAngle / 2;
+
+        const extraRotations =
+            360 * 7;
+
+        const finalRotation =
+            extraRotations +
+            (360 - targetAngle);
+
+
+        wheelRotation +=
+            finalRotation;
+
+
+        wheelCanvas.style.transform =
+            `rotate(${wheelRotation}deg)`;
+
+
+        /* ========================= */
+        /* WAIT FOR ANIMATION */
+        /* ========================= */
+
+        setTimeout(() => {
+
+            if (
+                data.result ===
+                "EXTRA_SPIN"
+            ) {
+
+                result.innerText =
+                    "🎁 You won 1 More Spin!";
+
+                freeBadge.classList.add(
+                    "show"
+                );
+
+                button.innerText =
+                    "🎁 FREE SPIN";
+
+            } else {
+
+                result.innerText =
+                    "😭 Better Luck Next Time!";
+
+                freeBadge.classList.remove(
+                    "show"
+                );
+
+                button.innerText =
+                    "🎡 SPIN — 100 🪙";
+            }
+
+            button.disabled = false;
+
+            wheelSpinning = false;
+
+        }, 5200);
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Spin error:",
+            error
+        );
+
+        result.innerText =
+            "Unable to spin. Try again.";
+
+        button.disabled = false;
+
+        wheelSpinning = false;
+    }
+}
+
+
+async function acceptIncomingCall() {
+
+    console.log(
+        "📹 Incoming call accepted:",
+        incomingCaller
+    );
+
+
+    if (!incomingCaller ||
+        !incomingCaller.profileId) {
+
+        console.error(
+            "❌ No caller profile found"
+        );
+
+        return;
+    }
+
+
+    /* STOP RINGING */
+
+    stopIncomingRinging();
+
+
+    try {
+
+        /*
+         * USE THE EXISTING
+         * VIDEO CALL START ENDPOINT
+         */
+
+        const response =
+            await fetch(
+                "/api/video-call/start/" +
+                incomingCaller.profileId,
+                {
+                    method: "POST"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "📹 Video call response:",
+            data
+        );
+
+
+        /*
+         * SERVER SAYS NOT ENOUGH COINS
+         */
+
+        if (!data.success) {
+
+            console.log(
+                "🪙 Not enough coins:",
+                data.coins
+            );
+
+
+            const balanceElement =
+                document.getElementById(
+                    "popupCoinBalance"
+                );
+
+
+            if (balanceElement) {
+
+                balanceElement.innerText =
+                    data.coins.toLocaleString();
+
+            }
+
+
+            /*
+             * CLOSE INCOMING CALL
+             */
+
+            document.getElementById(
+                "incomingCallOverlay"
+            ).classList.remove("show");
+
+
+            /*
+             * SHOW EXISTING RECHARGE POPUP
+             */
+
+            openRechargePopup();
+
+
+            /*
+             * Clear caller
+             */
+
+            incomingCaller = null;
+
+
+            /*
+             * Schedule another call later
+             */
+
+            scheduleIncomingCall();
+
+
+            return;
+        }
+
+
+        /*
+         * SUCCESS
+         *
+         * Server has already deducted
+         * the first 1,500 coins.
+         */
+
+        console.log(
+            "🪙 1,500 coins charged"
+        );
+
+        console.log(
+            "Remaining coins:",
+            data.coins
+        );
+
+
+        /*
+         * CLOSE POPUP
+         */
+
+        document.getElementById(
+            "incomingCallOverlay"
+        ).classList.remove("show");
+
+
+        /*
+         * OPEN EXISTING VIDEO CALL PAGE
+         */
+
+        window.location.href =
+            "/video-call/" +
+            incomingCaller.profileId +
+            "?sessionId=" +
+            data.sessionId;
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Incoming video call error:",
+            error
+        );
+
+
+        stopIncomingRinging();
+
+
+        alert(
+            "Unable to connect the video call. Please try again."
+        );
+
+    }
+
+}
+
+//START RANDOM INCOMING AI CALLS
+scheduleIncomingCall();
+
+</script>
+
+</body>
+
+</html>

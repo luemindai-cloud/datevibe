@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title> Profiles - Deedi Admin</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #ff82bd,
+                    #160912 60%
+                );
+        }
+
+        .header {
+            padding: 20px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            background:
+                rgba(0,0,0,0.25);
+
+            backdrop-filter: blur(15px);
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,0.15);
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff72b6;
+        }
+
+        .back {
+            color: white;
+            text-decoration: none;
+
+            padding: 10px 16px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,70,150,0.25);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 25px;
+        }
+
+        .top h2 {
+            margin: 0;
+        }
+
+        .add-btn {
+            text-decoration: none;
+            color: white;
+
+            padding: 12px 18px;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff4fa3,
+                    #ff8bca
+                );
+        }
+
+        .profiles {
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(250px, 1fr)
+                );
+
+            gap: 20px;
+        }
+
+        .profile-card {
+
+            padding: 20px;
+
+            border-radius: 20px;
+
+            background:
+                rgba(255,255,255,0.10);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.20);
+
+            backdrop-filter: blur(15px);
+
+            box-shadow:
+                0 0 25px
+                rgba(255,50,150,0.15);
+        }
+
+        .profile-image {
+
+            width: 100%;
+            height: 220px;
+
+            object-fit: cover;
+
+            border-radius: 15px;
+
+            margin-bottom: 15px;
+        }
+
+        .profile-card h3 {
+            margin: 5px 0;
+
+            color: #ff91c7;
+        }
+
+        .profile-card p {
+            color: #ddd;
+
+            line-height: 1.5;
+        }
+
+        .online {
+            color: #7cffb2;
+            font-weight: bold;
+        }
+
+        .offline {
+            color: #aaa;
+            font-weight: bold;
+        }
+        
+        .delete-btn {
+
+    width: 100%;
+
+    margin-top: 15px;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255, 50, 80, 0.20);
+
+    border:
+        1px solid
+        rgba(255, 80, 100, 0.35);
+
+    color: #ff9aaa;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.delete-btn:hover {
+
+    background:
+        rgba(255, 50, 80, 0.35);
+
+    transform: translateY(-2px);
+}
+
+    </style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="title">
+        DEEDI ADMIN
+    </div>
+
+    <a
+        href="/admin/dashboard"
+        class="back">
+        Dashboard
+    </a>
+
+</header>
+
+
+<div class="container">
+
+    <div class="top">
+
+        <h2>
+            🤖 AI Profiles
+        </h2>
+
+        <a
+            href="/admin/profiles/add"
+            class="add-btn">
+            ➕ Add Profile
+        </a>
+
+    </div>
+
+
+    <div class="profiles">
+
+        <div
+            class="profile-card"
+            th:each="profile : ${profiles}">
+
+            <img
+                class="profile-image"
+                th:src="@{'/api/image/' + ${profile.profileImage}}"
+                th:alt="${profile.name}"
+                onerror="this.parentElement.innerHTML='👩'">
+
+            <h3
+                th:text="${profile.name}">
+                Sofia
+            </h3>
+
+            <p>
+                Age:
+                <span th:text="${profile.age}">
+                    24
+                </span>
+            </p>
+
+            <p
+                th:text="${profile.description}">
+                Description
+            </p>
+
+            <p>
+                Personality:
+                <span
+                    th:text="${profile.personality}">
+                </span>
+            </p>
+
+            <p>
+                Video:
+                <span
+                    th:text="${profile.videoFile}">
+                </span>
+            </p>
+
+            <p
+                th:if="${profile.online}"
+                class="online">
+                ● Online
+            </p>
+
+            <p
+                th:unless="${profile.online}"
+                class="offline">
+                ● Offline
+            </p>
+            
+            <form
+    th:action="@{'/admin/profiles/delete/' + ${profile.id}}"
+    method="post"
+    onsubmit="return confirm('Are you sure you want to delete this AI profile?');">
+
+    <button
+        type="submit"
+        class="delete-btn">
+
+        🗑️ Delete Profile
+
+    </button>
+
+</form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

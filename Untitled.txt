@@ -1,0 +1,23 @@
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+application-local.properties
+application-prod.properties
+
+# Build output
+target/
+
+# Uploaded user files
+deedi-uploads/
+
+# IDE files
+.idea/
+*.iml
+.settings/
+.classpath
+.project
+
+# Logs
+*.log

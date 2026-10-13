@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Deedi Admin - Payments</title>
+
+    <style>
+
+        body {
+            margin: 0;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #ff82bd,
+                    #160912 60%
+                );
+
+            color: white;
+
+            min-height: 100vh;
+        }
+
+        .header {
+
+            padding: 20px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,0.15);
+
+            background:
+                rgba(0,0,0,0.25);
+
+            backdrop-filter: blur(15px);
+        }
+
+        .title {
+
+            font-size: 24px;
+
+            font-weight: bold;
+
+            color: #ff72b6;
+        }
+
+        .back {
+
+            color: white;
+
+            text-decoration: none;
+
+            padding: 10px 16px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,70,150,0.25);
+        }
+
+        .container {
+
+            max-width: 1200px;
+
+            margin: auto;
+
+            padding: 30px;
+        }
+
+        .page-title {
+
+            font-size: 28px;
+
+            margin-bottom: 25px;
+
+            color: #ff91c7;
+        }
+
+        .payment-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(300px, 1fr)
+                );
+
+            gap: 20px;
+        }
+
+        .payment-card {
+
+            padding: 22px;
+
+            border-radius: 20px;
+
+            background:
+                rgba(255,255,255,0.10);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.20);
+
+            backdrop-filter: blur(15px);
+
+            box-shadow:
+                0 0 25px
+                rgba(255,50,150,0.15);
+
+            transition: 0.25s;
+        }
+
+        .payment-card:hover {
+
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 0 35px
+                rgba(255,50,150,0.30);
+        }
+
+        .user-name {
+
+            font-size: 21px;
+
+            font-weight: bold;
+
+            color: #ff91c7;
+
+            margin-bottom: 15px;
+        }
+
+        .amount {
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            color: #ffd36a;
+
+            margin-bottom: 15px;
+        }
+
+        .info {
+
+            margin: 9px 0;
+
+            color: #ddd;
+
+            word-break: break-word;
+        }
+
+        .info strong {
+
+            color: white;
+        }
+
+        .status {
+
+            display: inline-block;
+
+            padding: 7px 13px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            margin-top: 10px;
+        }
+
+        .success {
+
+            background:
+                rgba(80,255,150,0.15);
+
+            color: #7CFFB2;
+        }
+
+        .pending {
+
+            background:
+                rgba(255,200,70,0.15);
+
+            color: #ffd36a;
+        }
+
+        .failed {
+
+            background:
+                rgba(255,70,70,0.15);
+
+            color: #ff8c8c;
+        }
+
+        .no-payments {
+
+            text-align: center;
+
+            padding: 50px;
+
+            border-radius: 20px;
+
+            background:
+                rgba(255,255,255,0.08);
+
+            color: #ccc;
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 20px;
+            }
+
+        }
+        
+        	.total-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    margin-bottom: 30px;
+    padding: 25px;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 105, 180, 0.25),
+            rgba(255, 211, 106, 0.12)
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,0.25);
+
+    backdrop-filter: blur(18px);
+
+    box-shadow:
+        0 0 30px
+        rgba(255,50,150,0.20);
+
+    transition: 0.25s;
+}
+
+.total-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 0 40px
+        rgba(255,50,150,0.35);
+}
+
+.total-icon {
+    width: 65px;
+    height: 65px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 18px;
+
+    font-size: 32px;
+
+    background:
+        rgba(255,211,106,0.15);
+
+    border:
+        1px solid
+        rgba(255,211,106,0.30);
+}
+
+.total-content {
+    flex: 1;
+}
+
+.total-label {
+    font-size: 15px;
+    color: #ddd;
+    margin-bottom: 5px;
+}
+
+.total-amount {
+    font-size: 34px;
+    font-weight: bold;
+    color: #ffd36a;
+
+    text-shadow:
+        0 0 15px
+        rgba(255,211,106,0.35);
+}
+
+.total-note {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #aaa;
+}
+
+    </style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="title">
+        DEEDI ADMIN
+    </div>
+
+    <a href="/admin/dashboard" class="back">
+        ← Dashboard
+    </a>
+
+</header>
+
+
+<div class="container">
+
+
+		<div class="total-card">
+
+    <div class="total-icon">
+        💰
+    </div>
+
+    <div class="total-content">
+
+        <div class="total-label">
+            Total Money Received
+        </div>
+
+        <div class="total-amount">
+            ₹<span th:text="${totalReceived}">0</span>
+        </div>
+
+        <div class="total-note">
+            Successful payments only
+        </div>
+
+    </div>
+
+</div>
+
+    <div class="page-title">
+        💰 All Payments
+    </div>
+
+
+    <div class="payment-grid"
+         th:if="${!payments.isEmpty()}">
+
+        <div class="payment-card"
+             th:each="payment : ${payments}">
+
+ <div class="user-name">
+
+    👤
+    <span
+        th:if="${userMap[payment.userId] != null}"
+        th:text="${userMap[payment.userId].name}">
+        User Name
+    </span>
+
+    <span
+        th:if="${userMap[payment.userId] == null}">
+        Unknown User
+    </span>
+
+</div>
+
+<div class="info"
+     th:if="${userMap[payment.userId] != null}">
+
+    🎂 Age:
+
+    <strong
+        th:text="${userMap[payment.userId].age}">
+        20
+    </strong>
+
+</div>
+
+
+            <div class="amount">
+
+                ₹<span th:text="${payment.amount}">
+                    199
+                </span>
+
+            </div>
+
+
+            <div class="info">
+
+                🪙 Coins:
+
+                <strong th:text="${payment.coins}">
+                    5000
+                </strong>
+
+            </div>
+
+
+            <div class="info">
+
+                📅 Date:
+
+                <strong
+                    th:text="${payment.createdAt != null
+                        ? #temporals.format(
+                            payment.createdAt,
+                            'dd MMM yyyy, hh:mm a'
+                          )
+                        : 'Unknown'}">
+
+                    23 Sep 2026
+
+                </strong>
+
+            </div>
+
+
+            <div class="info">
+
+                🧾 Order ID:
+
+                <strong th:text="${payment.orderId}">
+                    ORDER_ID
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span
+                    class="status"
+                    th:classappend="${
+                        payment.status.equalsIgnoreCase('SUCCESS')
+                        ? 'success'
+                        : payment.status.equalsIgnoreCase('PENDING')
+                        ? 'pending'
+                        : 'failed'
+                    }"
+                    th:text="${payment.status}">
+
+                    SUCCESS
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="no-payments"
+         th:if="${payments.isEmpty()}">
+
+        💳 No payment records found yet.
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

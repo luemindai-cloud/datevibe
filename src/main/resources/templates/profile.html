@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${profile.name} + ' | AI Video Chat'">
+         Profile
+    </title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(255, 105, 180, 0.18),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 90%,
+                    rgba(255, 220, 80, 0.12),
+                    transparent 30%
+                ),
+                #fff8fc;
+
+            color: #3a2030;
+        }
+
+        /* HEADER */
+
+        .header {
+
+            height: 68px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 18px;
+
+            background: rgba(255,255,255,0.88);
+
+            backdrop-filter: blur(15px);
+
+            border-bottom: 1px solid #f5d5e4;
+        }
+
+        .back {
+
+            text-decoration: none;
+
+            color: #e83f89;
+
+            font-size: 25px;
+
+            font-weight: 700;
+        }
+
+        .coin-box {
+
+            padding: 9px 14px;
+
+            border-radius: 20px;
+
+            background: #fff4bd;
+
+            color: #806500;
+
+            font-size: 13px;
+
+            font-weight: 800;
+        }
+
+        /* MAIN */
+
+        .container {
+
+            width: min(100%, 700px);
+
+            margin: auto;
+
+            padding: 22px 16px 40px;
+        }
+
+        /* PROFILE IMAGE */
+
+        .profile-image {
+
+            width: 100%;
+
+            height: min(65vh, 500px);
+
+            border-radius: 28px;
+
+            overflow: hidden;
+
+            position: relative;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffd6e8,
+                    #fff0f7
+                );
+
+            box-shadow:
+                0 15px 45px rgba(232, 63, 137, 0.15);
+
+            animation: appear 0.7s ease;
+        }
+
+        @keyframes appear {
+
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-image img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
+        }
+
+        .image-placeholder {
+
+            height: 100%;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            font-size: 100px;
+        }
+
+        .online {
+
+            position: absolute;
+
+            top: 15px;
+
+            right: 15px;
+
+            padding: 7px 12px;
+
+            background: rgba(255,255,255,0.92);
+
+            border-radius: 20px;
+
+            color: #2e9b62;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+        /* INFO */
+
+        .info {
+
+            padding: 20px 4px;
+        }
+
+        .name {
+
+            font-size: 30px;
+
+            font-weight: 800;
+
+            color: #e83f89;
+        }
+
+        .age {
+
+            color: #947183;
+
+            font-size: 16px;
+
+            margin-left: 5px;
+        }
+
+        .ai-label {
+
+            display: inline-block;
+
+            margin-top: 8px;
+
+            padding: 5px 10px;
+
+            border-radius: 15px;
+
+            background: #fff0f7;
+
+            color: #d7357b;
+
+            font-size: 11px;
+
+            font-weight: 800;
+        }
+
+        .description {
+
+            margin-top: 12px;
+
+            color: #765568;
+
+            line-height: 1.6;
+
+            font-size: 14px;
+        }
+
+        /* BUTTONS */
+
+        .actions {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 12px;
+
+            margin-top: 20px;
+        }
+
+        .action-btn {
+
+            height: 54px;
+
+            border: none;
+
+            border-radius: 17px;
+
+            font-size: 14px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.25s;
+        }
+
+        .chat-btn {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff3f91,
+                    #ff78b4
+                );
+
+            color: white;
+
+            box-shadow:
+                0 8px 20px rgba(255,63,145,0.22);
+        }
+
+        .video-btn {
+
+            background: #fff4bd;
+
+            color: #806500;
+
+            box-shadow:
+                0 8px 20px rgba(255,210,70,0.16);
+        }
+
+        .action-btn:hover {
+
+            transform: translateY(-3px);
+        }
+
+        /* AI NOTICE */
+
+        .notice {
+
+            margin-top: 18px;
+
+            padding: 13px 15px;
+
+            border-radius: 15px;
+
+            background: rgba(255,255,255,0.8);
+
+            border: 1px solid #f4d9e5;
+
+            color: #886b7a;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 15px 13px 35px;
+            }
+
+            .profile-image {
+                height: 58vh;
+                border-radius: 23px;
+            }
+
+            .name {
+                font-size: 27px;
+            }
+
+            .actions {
+                grid-template-columns: 1fr;
+            }
+
+        }
+        
+        .action-btn {
+    height: 54px;
+
+    border: none;
+    border-radius: 17px;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.25s;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-decoration: none;
+}
+
+		/* =========================
+   GIFT SECTION
+========================= */
+
+.gift-section {
+    margin-top: 22px;
+    padding: 18px;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.82);
+    border: 1px solid #f4d9e5;
+    box-shadow: 0 10px 30px rgba(232,63,137,0.10);
+}
+
+.gift-title {
+    text-align: center;
+    color: #e83f89;
+    font-size: 19px;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.gift-subtitle {
+    text-align: center;
+    color: #947183;
+    font-size: 12px;
+    margin-bottom: 16px;
+}
+
+.gift-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.gift-card {
+    border: 1px solid #f3d6e4;
+    background: linear-gradient(145deg, #fff, #fff5fa);
+    border-radius: 16px;
+    padding: 10px 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.25s;
+}
+
+.gift-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 18px rgba(232,63,137,0.16);
+}
+
+.gift-icon {
+    font-size: 30px;
+    line-height: 1.2;
+}
+
+.gift-name {
+    margin-top: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #6e4c5e;
+}
+
+.gift-price {
+    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #806500;
+}
+
+.gift-card.sending {
+    transform: scale(0.94);
+    opacity: 0.6;
+}
+
+@media (max-width: 600px) {
+
+    .gift-section {
+        padding: 15px 12px;
+    }
+
+    .gift-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .gift-icon {
+        font-size: 27px;
+    }
+}
+
+	@keyframes giftPop {
+
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3);
+    }
+
+    25% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.15);
+    }
+
+    55% {
+        transform: translate(-50%, -55%) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -85%) scale(0.9);
+    }
+}
+
+    </style>
+    
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+
+</head>
+
+<body>
+
+
+<header class="header">
+
+    <a href="/home"
+       class="back">
+        ←
+    </a>
+
+<div class="coin-box">
+    🪙 <span id="profileCoinBalance">0</span> Coins
+</div>
+
+</header>
+
+
+<main class="container"
+      th:attr="data-profile-id=${profile.id},data-profile-name=${profile.name}">
+
+
+    <div class="profile-image">
+
+    <img
+   th:src="@{'/api/image/' + ${profile.profileImage}}"
+        th:alt="${profile.name}"
+        onerror="this.parentElement.innerHTML='👩'">
+
+    <div
+        th:unless="${profile.profileImage != null and !profile.profileImage.isEmpty()}"
+        class="image-placeholder">
+
+        👩
+
+    </div>
+
+    <span
+        class="online"
+        th:if="${profile.online}">
+
+        🟢 Online
+
+    </span>
+
+    <span
+        class="online"
+        th:unless="${profile.online}">
+
+        ⚪ Offline
+
+    </span>
+
+</div>
+
+    </div>
+
+
+    <section class="info">
+
+        <div>
+
+            <span class="name"
+                  th:text="${profile.name}">
+                Sofia
+            </span>
+
+            <span class="age">
+                <span th:text="${profile.age}">
+                    24
+                </span>
+                years
+            </span>
+
+        </div>
+
+
+        <div class="ai-label">
+            ✨ your match
+        </div>
+
+
+        <p class="description"
+           th:text="${profile.description}">
+            Sweet, friendly and loves interesting conversations.
+        </p>
+
+
+        <div class="actions">
+
+     	<a th:href="@{'/chat/' + ${profile.id}}"
+   		class="action-btn chat-btn">
+    	💬 CHAT
+		</a>
+
+<button class="action-btn video-btn"
+        onclick="startVideoCall()">
+
+    📹 VIDEO CALL
+
+</button>
+
+        </div>
+
+		<!-- =========================
+     GIFT SECTION
+========================= -->
+
+<div class="gift-section">
+
+    <div class="gift-title">
+        🎁 Send a Gift
+    </div>
+
+    <div class="gift-subtitle">
+        Send something special to
+        <strong th:text="${profile.name}">Sofia</strong> 💗
+    </div>
+
+    <div id="giftGrid" class="gift-grid">
+
+        <!-- Gifts will load here -->
+
+    </div>
+
+</div>
+
+        <div class="notice">
+
+            ✨  chat and video call as much as you want
+
+        </div>
+
+    </section>
+
+<div th:replace="~{fragments/recharge-popup :: rechargePopup}"></div>
+
+</main>
+
+<script th:inline="javascript">
+
+async function startVideoCall() {
+
+    console.log("📹 VIDEO CALL clicked");
+
+    const container =
+        document.querySelector(".container");
+
+    const profileId =
+        container.dataset.profileId;
+
+    try {
+
+        const response = await fetch(
+            "/api/video-call/start/" + profileId,
+            {
+                method: "POST"
+            }
+        );
+
+        const data = await response.json();
+
+        console.log("Video call response:", data);
+
+        if (!response.ok) {
+            alert(data.error || "Unable to start video call.");
+            return;
+        }
+
+        // Not enough coins
+        if (!data.success) {
+
+            const balanceElement =
+                document.getElementById("popupCoinBalance");
+
+            if (balanceElement) {
+                balanceElement.innerText =
+                    data.coins.toLocaleString();
+            }
+
+            openRechargePopup();
+
+            return;
+        }
+
+        // Successfully charged 1,500 coins
+        console.log("🪙 1,500 coins deducted");
+        console.log("Remaining coins:", data.coins);
+
+        // Start video call
+        window.location.href =
+            "/video-call/" + profileId +
+            "?sessionId=" + data.sessionId;
+    } catch (error) {
+
+        console.error("Video call error:", error);
+
+        alert("Unable to start video call.");
+    }
+}
+
+//=========================
+//GIFT SYSTEM
+//=========================
+
+async function loadGifts() {
+
+ try {
+
+     const response = await fetch("/api/gifts");
+
+     if (!response.ok) {
+         throw new Error("Failed to load gifts");
+     }
+
+     const gifts = await response.json();
+
+     const giftGrid =
+         document.getElementById("giftGrid");
+
+     if (!giftGrid) {
+         return;
+     }
+
+     giftGrid.innerHTML = "";
+
+     gifts.forEach(gift => {
+
+         const giftCard =
+             document.createElement("div");
+
+         giftCard.className = "gift-card";
+
+         giftCard.innerHTML = `
+             <div class="gift-icon">
+                 ${gift.icon}
+             </div>
+
+             <div class="gift-name">
+                 ${gift.name}
+             </div>
+
+             <div class="gift-price">
+                 🪙 ${gift.coins.toLocaleString()}
+             </div>
+         `;
+
+         giftCard.addEventListener(
+             "click",
+             () => sendGift(gift, giftCard)
+         );
+
+         giftGrid.appendChild(giftCard);
+
+     });
+
+ } catch (error) {
+
+     console.error(
+         "❌ Failed to load gifts:",
+         error
+     );
+
+ }
+}
+
+
+//=========================
+//SEND GIFT
+//=========================
+
+async function sendGift(gift, giftCard) {
+
+    const container =
+        document.querySelector(".container");
+
+    const profileId =
+        container.dataset.profileId;
+
+ console.log(
+     "🎁 Sending gift:",
+     gift.name,
+     "Cost:",
+     gift.coins
+ );
+
+ giftCard.classList.add("sending");
+
+ try {
+
+     const formData =
+         new URLSearchParams();
+
+     formData.append(
+         "profileId",
+         profileId
+     );
+
+     formData.append(
+         "giftId",
+         gift.id
+     );
+
+     const response = await fetch(
+         "/api/gifts/send",
+         {
+             method: "POST",
+             headers: {
+                 "Content-Type":
+                     "application/x-www-form-urlencoded"
+             },
+             body: formData
+         }
+     );
+
+     const data =
+         await response.json();
+
+     console.log(
+         "🎁 Gift response:",
+         data
+     );
+
+
+     // =========================
+     // NOT ENOUGH COINS
+     // =========================
+
+     if (data.notEnoughCoins) {
+
+         giftCard.classList.remove(
+             "sending"
+         );
+
+         const balanceElement =
+             document.getElementById(
+                 "popupCoinBalance"
+             );
+
+         if (balanceElement) {
+
+             balanceElement.innerText =
+                 data.coins.toLocaleString();
+
+         }
+
+         openRechargePopup();
+
+         return;
+     }
+
+
+     // =========================
+     // ERROR
+     // =========================
+
+     if (!data.success) {
+
+         giftCard.classList.remove(
+             "sending"
+         );
+
+         alert(
+             data.error ||
+             "Unable to send gift."
+         );
+
+         return;
+     }
+
+
+     // =========================
+     // SUCCESS
+     // =========================
+
+     console.log(
+         "💗 Gift sent successfully!"
+     );
+
+     console.log(
+         "Remaining coins:",
+         data.coins
+     );
+
+
+     // Update profile coin balance
+
+     const coinElement =
+         document.getElementById(
+             "profileCoinBalance"
+         );
+
+     if (coinElement) {
+
+         coinElement.innerText =
+             data.coins.toLocaleString();
+
+     }
+
+
+     // Gift animation
+
+     showGiftAnimation(
+         data.giftIcon,
+         data.giftName
+     );
+
+
+ } catch (error) {
+
+     console.error(
+         "❌ Gift sending error:",
+         error
+     );
+
+     alert(
+         "Unable to send gift."
+     );
+
+ } finally {
+
+     giftCard.classList.remove(
+         "sending"
+     );
+
+ }
+}
+
+
+//=========================
+//GIFT ANIMATION
+//=========================
+
+function showGiftAnimation(
+ icon,
+ name
+) {
+
+ const giftAnimation =
+     document.createElement("div");
+
+ giftAnimation.innerHTML = `
+     <div style="
+         position:fixed;
+         left:50%;
+         top:50%;
+         transform:translate(-50%,-50%);
+         z-index:9999;
+         text-align:center;
+         pointer-events:none;
+         animation:giftPop 1.5s ease forwards;
+     ">
+
+         <div style="
+             font-size:80px;
+             filter:drop-shadow(
+                 0 8px 20px
+                 rgba(232,63,137,0.35)
+             );
+         ">
+             ${icon}
+         </div>
+
+         <div style="
+             margin-top:8px;
+             padding:8px 16px;
+             border-radius:20px;
+             background:white;
+             color:#e83f89;
+             font-weight:800;
+             box-shadow:
+                 0 8px 25px
+                 rgba(0,0,0,0.12);
+         ">
+             ${name} sent to
+				${document.querySelector(".container").dataset.profileName} 💗
+         </div>
+
+     </div>
+ `;
+
+ document.body.appendChild(
+     giftAnimation
+ );
+
+ setTimeout(() => {
+
+     giftAnimation.remove();
+
+ }, 1500);
+}
+
+
+//Load gifts
+
+loadGifts();
+
+async function loadProfileCoins() {
+    try {
+        const response = await fetch("/api/user/coins");
+        const data = await response.json();
+
+        console.log("🪙 Profile coin balance:", data);
+
+        if (data.loggedIn) {
+            const coinElement =
+                document.getElementById("profileCoinBalance");
+
+            if (coinElement) {
+                coinElement.innerText =
+                    data.coins.toLocaleString();
+            }
+        }
+
+    } catch (error) {
+        console.error("❌ Failed to load profile coins:", error);
+    }
+}
+
+loadProfileCoins();
+
+</script>
+
+</body>
+
+</html>

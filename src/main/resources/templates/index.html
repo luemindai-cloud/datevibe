@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AI Video Chat</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow: hidden;
+
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255, 105, 180, 0.35), transparent 30%),
+                radial-gradient(circle at 80% 80%, rgba(255, 220, 80, 0.20), transparent 30%),
+                linear-gradient(135deg, #fff5fa, #ffe1ef, #ffffff);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            color: #3a2030;
+        }
+
+        /* Floating background bubbles */
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.55;
+
+            animation: float 7s ease-in-out infinite;
+        }
+
+        .bubble.one {
+            width: 120px;
+            height: 120px;
+
+            background: #ff9acb;
+
+            top: 8%;
+            left: 5%;
+        }
+
+        .bubble.two {
+            width: 80px;
+            height: 80px;
+
+            background: #ffd84d;
+
+            bottom: 15%;
+            right: 8%;
+
+            animation-delay: 1.5s;
+        }
+
+        .bubble.three {
+            width: 60px;
+            height: 60px;
+
+            background: #ff69b4;
+
+            top: 20%;
+            right: 12%;
+
+            animation-delay: 3s;
+        }
+
+        @keyframes float {
+
+            0%, 100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-25px);
+            }
+        }
+
+        /* Main card */
+
+        .container {
+
+            position: relative;
+            z-index: 2;
+
+            width: min(92%, 430px);
+
+            padding: 42px 28px 30px;
+
+            text-align: center;
+
+            background: rgba(255, 255, 255, 0.72);
+
+            border: 1px solid rgba(255, 255, 255, 0.9);
+
+            border-radius: 32px;
+
+            backdrop-filter: blur(20px);
+
+            box-shadow:
+                0 20px 60px rgba(255, 76, 150, 0.18);
+
+            animation: cardEnter 0.9s ease;
+        }
+
+        @keyframes cardEnter {
+
+            from {
+                opacity: 0;
+                transform: translateY(35px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Logo */
+
+        .logo {
+
+            width: 120px;
+            height: 120px;
+
+            margin: 0 auto 20px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            border-radius: 25px;
+
+            box-shadow:
+                0 12px 30px rgba(255, 79, 154, 0.35);
+
+            animation: logoPulse 2.5s ease-in-out infinite;
+            
+            overflow: hidden;
+        }
+
+        @keyframes logoPulse {
+
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.06);
+            }
+        }
+
+        h1 {
+
+            font-size: clamp(28px, 8vw, 36px);
+
+            font-weight: 800;
+
+            margin-bottom: 10px;
+
+            background: linear-gradient(
+                90deg,
+                #ff3f91,
+                #ff71ad
+            );
+
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+
+            color: #79566a;
+
+            font-size: 15px;
+
+            line-height: 1.6;
+
+            margin-bottom: 30px;
+        }
+
+        /* Buttons */
+
+        .btn {
+
+            width: 100%;
+
+            min-height: 56px;
+
+            border-radius: 18px;
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            text-decoration: none;
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+            transition: all 0.3s ease;
+
+            cursor: pointer;
+        }
+
+        .quick-btn {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ff3f91,
+                    #ff78b4
+                );
+
+            color: white;
+
+            box-shadow:
+                0 10px 25px rgba(255, 63, 145, 0.25);
+
+            border: none;
+        }
+
+        .login-btn {
+
+            margin-top: 14px;
+
+            background: white;
+
+            color: #e83f89;
+
+            border: 1px solid #ffd0e3;
+
+        }
+
+        .btn:hover {
+
+            transform: translateY(-3px);
+
+        }
+
+        .quick-btn:hover {
+
+            box-shadow:
+                0 15px 35px rgba(255, 63, 145, 0.35);
+
+        }
+
+        .login-btn:hover {
+
+            background: #fff7fb;
+
+        }
+
+        .btn:active {
+
+            transform: scale(0.97);
+
+        }
+
+        /* Yellow accent */
+
+        .accent {
+
+            display: inline-block;
+
+            margin-top: 25px;
+
+            padding: 7px 14px;
+
+            border-radius: 20px;
+
+            background: #fff4b8;
+
+            color: #8a6b00;
+
+            font-size: 12px;
+
+            font-weight: 600;
+        }
+
+        .footer {
+
+            margin-top: 20px;
+
+            font-size: 11px;
+
+            color: #a48b99;
+
+            line-height: 1.5;
+        }
+
+        /* Mobile */
+
+        @media (max-width: 480px) {
+
+            body {
+                padding: 20px;
+            }
+
+            .container {
+
+                padding: 35px 22px 25px;
+
+                border-radius: 28px;
+            }
+
+            .logo {
+
+                width: 100px;
+                height: 100px;
+            }
+
+            .subtitle {
+
+                font-size: 14px;
+
+                margin-bottom: 26px;
+            }
+
+            .btn {
+
+                min-height: 58px;
+
+                font-size: 15px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Animated background -->
+
+    <div class="bubble one"></div>
+    <div class="bubble two"></div>
+    <div class="bubble three"></div>
+
+
+    <!-- Main content -->
+
+    <main class="container">
+
+        <div class="logo">
+            <img src="/static/images/logo.jpeg" 
+                 alt="DateVibe" 
+                 style="width: 120px; height: 120px; object-fit: cover; border-radius: 25px;">
+        </div>
+
+        <h1>
+            DateVibe
+        </h1>
+
+        <p class="subtitle">
+
+            Meet your companions,
+            start conversations and
+            enjoy interactive experiences.
+
+        </p>
+
+
+        <a href="/quick-login"
+           class="btn quick-btn">
+
+            ✨ QUICK LOGIN
+
+        </a>
+
+
+        <a href="#"
+           class="btn login-btn">
+
+            🔐 ALREADY LOGGED IN
+
+        </a>
+
+
+        <div class="accent">
+
+            ✨ 50+ Companions
+
+        </div>
+
+
+        <p class="footer">
+
+            chat with your pasandita aurat.
+            <br>
+            18+ only.
+
+        </p>
+
+    </main>
+
+</body>
+
+</html>
