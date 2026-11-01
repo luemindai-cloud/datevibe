@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Deedi Admin </title>
+    <title>Deedi Admin</title>
 
     <style>
 
@@ -83,9 +83,19 @@
 
         .welcome {
 
-            margin-bottom: 30px;
+            margin-bottom: 25px;
 
             font-size: 18px;
+        }
+
+        .alert-success {
+            padding: 12px 18px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            background: rgba(124, 255, 178, 0.20);
+            border: 1px solid rgba(124, 255, 178, 0.45);
+            color: #7cffb2;
+            font-weight: bold;
         }
 
         .cards {
@@ -95,7 +105,7 @@
             grid-template-columns:
                 repeat(
                     auto-fit,
-                    minmax(200px, 1fr)
+                    minmax(260px, 1fr)
                 );
 
             gap: 20px;
@@ -134,54 +144,137 @@
 
             font-size: 14px;
         }
-        
+
         .admin-card {
-    display: block;
+            display: block;
 
-    padding: 25px;
+            padding: 25px;
 
-    border-radius: 20px;
+            border-radius: 20px;
 
-    background:
-        rgba(255,255,255,0.10);
+            background:
+                rgba(255,255,255,0.10);
 
-    border:
-        1px solid
-        rgba(255,255,255,0.20);
+            border:
+                1px solid
+                rgba(255,255,255,0.20);
 
-    backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
 
-    box-shadow:
-        0 0 25px
-        rgba(255,50,150,0.15);
+            box-shadow:
+                0 0 25px
+                rgba(255,50,150,0.15);
 
-    color: white;
+            color: white;
 
-    text-decoration: none;
+            text-decoration: none;
 
-    transition: 0.25s;
-}
+            transition: 0.25s;
+        }
 
-.admin-card:hover {
-    transform: translateY(-4px);
+        .admin-card:hover {
+            transform: translateY(-4px);
 
-    box-shadow:
-        0 0 35px
-        rgba(255,50,150,0.30);
-}
+            box-shadow:
+                0 0 35px
+                rgba(255,50,150,0.30);
+        }
 
-.admin-card h3 {
-    color: #ff91c7;
-}
+        .admin-card h3 {
+            color: #ff91c7;
+            margin-top: 0;
+        }
 
-.admin-card p {
-    color: #ccc;
-}
+        .admin-card p {
+            color: #ccc;
+        }
 
-.admin-card span {
-    color: #ff72b6;
-    font-weight: bold;
-}
+        .admin-card span {
+            color: #ff72b6;
+            font-weight: bold;
+        }
+
+        /* UPI Settings Section */
+        .settings-card {
+            margin-top: 35px;
+            padding: 25px;
+            border-radius: 22px;
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(255,255,255,0.20);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 0 30px rgba(255,50,150,0.15);
+        }
+
+        .settings-card h3 {
+            margin-top: 0;
+            color: #ffd36a;
+            font-size: 20px;
+        }
+
+        .settings-card p {
+            color: #ddd;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: #ff91c7;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #ff72b6;
+            box-shadow: 0 0 10px rgba(255,114,182,0.4);
+        }
+
+        .save-btn {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ff4fa3, #ff8bca);
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            height: 44px;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,79,163,0.4);
+        }
 
     </style>
 
@@ -195,9 +288,7 @@
         DEEDI ADMIN
     </div>
 
-    <a
-        href="/admin/logout"
-        class="logout">
+    <a href="/admin/logout" class="logout">
         Logout
     </a>
 
@@ -215,55 +306,92 @@
 
     </div>
 
-    <a href="/admin/users" class="admin-card">
+    <div class="alert-success" th:if="${param.upiUpdated}">
+        ✅ UPI Settings successfully updated! All new payment QR codes will use this UPI ID.
+    </div>
 
-    <h3>👥 Users</h3>
+    <div class="cards">
 
-    <p>
-        View users, coins and payment information
-    </p>
+        <a href="/admin/users" class="admin-card">
 
-    <span>
-        Manage Users →
-    </span>
+            <h3>👥 Users</h3>
 
-	</a>
+            <p>
+                View registered users, track coin balances, manage or delete user accounts
+            </p>
 
-<a href="/admin/payments" class="admin-card">
+            <span>
+                Manage Users →
+            </span>
 
-    <h3>💰 Payments</h3>
+        </a>
 
-    <p>
-        View all user payments and transactions
-    </p>
+        <a href="/admin/payments" class="admin-card">
 
-    <span>
-        Manage Payments →
-    </span>
+            <h3>💰 Payments</h3>
 
-</a>
+            <p>
+                Review transactions, UTR references and manually approve payments
+            </p>
+
+            <span>
+                Manage Payments →
+            </span>
+
+        </a>
 
         <a href="/admin/profiles" class="admin-card">
 
-    <h3>🤖 AI Profiles</h3>
+            <h3>🤖 AI Profiles</h3>
 
-    <p>
-        Add, edit and manage AI profiles
-    </p>
+            <p>
+                Add, manage, and delete AI companions shown on the home page
+            </p>
 
-    <span>
-        Manage Profiles →
-    </span>
+            <span>
+                Manage Profiles →
+            </span>
 
-</a>
+        </a>
 
         <div class="card">
             <h3>🎁 Gifts</h3>
             <p class="coming">
-                Gift management coming next
+                22 Gifts active in chat & video calls
             </p>
         </div>
 
+    </div>
+
+    <!-- UPI GATEWAY CONFIGURATION -->
+    <div class="settings-card">
+        <h3>⚡ UPI Payment Gateway Configuration</h3>
+        <p>Configure the UPI ID and Payee Name used for dynamic QR codes and payment deep-links (GPay, PhonePe, Paytm):</p>
+
+        <form action="/admin/settings/upi" method="post">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="upiId">Your UPI ID (VPA)</label>
+                    <input type="text" id="upiId" name="upiId" th:value="${currentUpiId}" placeholder="e.g. yourname@okhdfcbank" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="payeeName">Payee / Business Name</label>
+                    <input type="text" id="payeeName" name="payeeName" th:value="${currentPayeeName}" placeholder="e.g. DEEDI AI" required>
+                </div>
+
+                <button type="submit" class="save-btn">
+                    💾 Save Settings
+                </button>
+            </div>
+
+            <div style="margin-top: 16px; padding: 12px 16px; background: rgba(0,0,0,0.3); border-radius: 12px; display: flex; align-items: center; gap: 12px;">
+                <input type="checkbox" id="autoApprove" name="autoApprove" value="true" th:checked="${autoApprove}" style="width: 18px; height: 18px; cursor: pointer;">
+                <label for="autoApprove" style="font-size: 13px; color: #fff; cursor: pointer;">
+                    <strong>Instant Auto-Credit Mode (Trust Mode)</strong> — If checked, coins are added immediately whenever a user enters any unique 12-digit UTR without requiring admin review. <span style="color: #ff91c7;">(Leave unchecked for safe mode: admin reviews UTR in Payments tab before approving).</span>
+                </label>
+            </div>
+        </form>
     </div>
 
 </div>

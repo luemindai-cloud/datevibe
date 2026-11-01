@@ -569,7 +569,7 @@
 
     </style>
     
-    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    
 
 </head>
 
@@ -927,9 +927,7 @@
 <script>
 
 async function buyPackage(amount, coins) {
-
     try {
-
         const response = await fetch(
             "/api/payment/create?packageId=" + amount,
             {
@@ -938,29 +936,26 @@ async function buyPackage(amount, coins) {
         );
 
         const data = await response.json();
+        console.log("Payment order created:", data);
 
-        if (!response.ok) {
+        if (!response.ok || !data.success) {
+            if (data.redirectUrl) {
+                window.location.href = data.redirectUrl;
+                return;
+            }
             alert(data.error || "Unable to create payment.");
             return;
         }
 
-        console.log("Cashfree order:", data);
-
-        const cashfree = Cashfree({
-            mode: "sandbox"
-        });
-
-        cashfree.checkout({
-            paymentSessionId: data.paymentSessionId
-        });
-
+        if (data.checkoutUrl) {
+            // Redirect to the new styled UPI payment gateway interface
+            window.location.href = data.checkoutUrl;
+        } else {
+            alert("Payment checkout link was not received.");
+        }
     } catch (error) {
-
         console.error("Payment error:", error);
-
-        alert(
-            "Something went wrong while starting payment."
-        );
+        alert("Something went wrong while starting payment.");
     }
 }
 

@@ -476,7 +476,7 @@
 
     </style>
     
-    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    
 
 </head>
 
@@ -506,7 +506,7 @@
     <img
    th:src="@{'/api/image/' + ${profile.profileImage}}"
         th:alt="${profile.name}"
-        onerror="this.parentElement.innerHTML='👩'">
+        onerror="this.src='/static/images/logo.jpeg'">
 
     <div
         th:unless="${profile.profileImage != null and !profile.profileImage.isEmpty()}"

@@ -21,6 +21,10 @@ public class PaymentOrder {
 
     private String status;
 
+    private String utrNumber;
+
+    private String upiId;
+
     private LocalDateTime createdAt;
 
     public PaymentOrder() {
@@ -31,6 +35,16 @@ public class PaymentOrder {
         this.orderId = orderId;
         this.amount = amount;
         this.coins = coins;
+        this.status = "PENDING";
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public PaymentOrder(Long userId, String orderId, int amount, int coins, String upiId) {
+        this.userId = userId;
+        this.orderId = orderId;
+        this.amount = amount;
+        this.coins = coins;
+        this.upiId = upiId;
         this.status = "PENDING";
         this.createdAt = LocalDateTime.now();
     }
@@ -57,6 +71,22 @@ public class PaymentOrder {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getUtrNumber() {
+        return utrNumber;
+    }
+
+    public void setUtrNumber(String utrNumber) {
+        this.utrNumber = utrNumber;
+    }
+
+    public String getUpiId() {
+        return upiId;
+    }
+
+    public void setUpiId(String upiId) {
+        this.upiId = upiId;
     }
 
     public LocalDateTime getCreatedAt() {

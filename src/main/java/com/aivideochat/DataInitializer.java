@@ -1,131 +1,30 @@
 package com.aivideochat;
 
-import com.aivideochat.entity.AiProfile;
-import com.aivideochat.repository.AiProfileRepository;
+import com.aivideochat.entity.Admin;
+import com.aivideochat.entity.Gift;
+import com.aivideochat.repository.AdminRepository;
+import com.aivideochat.repository.GiftRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import com.aivideochat.entity.Gift;
-import com.aivideochat.repository.GiftRepository;
-
-import com.aivideochat.entity.Admin;
-import com.aivideochat.repository.AdminRepository;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
-    private final AiProfileRepository aiProfileRepository;
     private final GiftRepository giftRepository;
     private final AdminRepository adminRepository;
-    
 
-    public DataInitializer(AiProfileRepository aiProfileRepository,GiftRepository giftRepository,
-    		AdminRepository adminRepository) {
-        this.aiProfileRepository = aiProfileRepository;
+    public DataInitializer(GiftRepository giftRepository, AdminRepository adminRepository) {
         this.giftRepository = giftRepository;
         this.adminRepository = adminRepository;
-
     }
 
     @Override
     public void run(String... args) {
 
-        if (aiProfileRepository.count() == 0) {
+        // NOTE: AI profiles are NOT auto-seeded here so that initial setup starts blank.
+        // The administrator can manually add and delete AI companions via the Admin Panel (/admin/profiles).
 
-            AiProfile sofia = new AiProfile(
-                "Sofia",
-                24,
-                "Sweet, friendly and loves interesting conversations.",
-                "Sweet and caring",
-                "083a8963-a6e5-4fa8-a1f9-734b791ecdcd.jpeg",
-                true
-            );
-
-            sofia.setVideoFile("68b4fb8d-8ad3-48e9-95ea-0ecba43fae80.mp4");
-
-            aiProfileRepository.save(sofia);
-
-
-            AiProfile emma = new AiProfile(
-                "Emma",
-                23,
-                "Fun, playful and always ready for a conversation.",
-                "Playful and energetic",
-                "3787450d-cbc5-4c22-9c5c-dece43ed9cdc.jpeg",
-                true
-            );
-
-            emma.setVideoFile("9cadbe5c-3ae2-4584-b852-6bf0fedef95f.mp4");
-
-            aiProfileRepository.save(emma);
-
-
-            AiProfile mia = new AiProfile(
-                "Mia",
-                25,
-                "Calm, caring and enjoys meaningful conversations.",
-                "Calm and caring",
-                "38c1f6f1-3765-4ecc-abc7-2e153d00d63d.jpeg",
-                true
-            );
-
-            mia.setVideoFile("cd0d0ac6-29c9-493d-8391-f6ef7ee37ea3.mp4");
-
-            aiProfileRepository.save(mia);
-
-
-            AiProfile lily = new AiProfile(
-                "Lily",
-                22,
-                "Cheerful, energetic and loves meeting new people.",
-                "Cheerful and adventurous",
-                "42a8212d-e76c-48b4-8ebb-dee2696a5c1c.jpg",
-                true
-            );
-
-            lily.setVideoFile("d2f0d0bf-93d8-4a18-88d0-004e5acb5d9a.mp4");
-
-            aiProfileRepository.save(lily);
-
-
-            System.out.println(
-                "AI profiles created successfully!"
-            );
-
-        } else {
-
-            for (AiProfile profile : aiProfileRepository.findAll()) {
-
-                if (profile.getName().equalsIgnoreCase("Sofia")) {
-                    profile.setProfileImage("083a8963-a6e5-4fa8-a1f9-734b791ecdcd.jpeg");
-                    profile.setVideoFile("68b4fb8d-8ad3-48e9-95ea-0ecba43fae80.mp4");
-                }
-
-                if (profile.getName().equalsIgnoreCase("Emma")) {
-                    profile.setProfileImage("3787450d-cbc5-4c22-9c5c-dece43ed9cdc.jpeg");
-                    profile.setVideoFile("9cadbe5c-3ae2-4584-b852-6bf0fedef95f.mp4");
-                }
-
-                if (profile.getName().equalsIgnoreCase("Mia")) {
-                    profile.setProfileImage("38c1f6f1-3765-4ecc-abc7-2e153d00d63d.jpeg");
-                    profile.setVideoFile("cd0d0ac6-29c9-493d-8391-f6ef7ee37ea3.mp4");
-                }
-
-                if (profile.getName().equalsIgnoreCase("Lily")) {
-                    profile.setProfileImage("42a8212d-e76c-48b4-8ebb-dee2696a5c1c.jpg");
-                    profile.setVideoFile("d2f0d0bf-93d8-4a18-88d0-004e5acb5d9a.mp4");
-                }
-
-                aiProfileRepository.save(profile);
-            }
-
-            System.out.println(
-                "Existing AI profiles updated with video files!"
-            );
-        }
-        
         if (giftRepository.count() == 0) {
-
             giftRepository.save(new Gift("Rose", "🌹", 10));
             giftRepository.save(new Gift("Kiss", "💋", 30));
             giftRepository.save(new Gift("Heart", "❤️", 50));
@@ -151,14 +50,14 @@ public class DataInitializer implements CommandLineRunner {
 
             System.out.println("🎁 22 gifts added successfully!");
         }
-        
-        if (adminRepository.count() == 0) {
 
+        if (adminRepository.count() == 0) {
             Admin admin = new Admin(
                     "ayanadmin",
                     "ayandeediowner@916"
             );
             adminRepository.save(admin);
+            System.out.println("🛡️ Default Admin created: ayanadmin");
         }
     }
 }

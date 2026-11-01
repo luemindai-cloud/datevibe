@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Payment Checkout | DEEDI</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 10% 10%, rgba(255, 79, 163, 0.25), transparent 35%),
+                radial-gradient(circle at 90% 90%, rgba(255, 211, 106, 0.18), transparent 35%),
+                #160912;
+            color: #fff;
+            padding: 20px 14px 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .gateway-header {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(14px);
+            border-radius: 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #ff72b6;
+        }
+
+        .brand-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .cancel-btn {
+            color: #ff91c7;
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 14px;
+            border-radius: 10px;
+            background: rgba(255, 79, 163, 0.15);
+            border: 1px solid rgba(255, 79, 163, 0.3);
+            transition: 0.2s;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(255, 79, 163, 0.3);
+        }
+
+        .checkout-card {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 26px;
+            padding: 24px 20px;
+            box-shadow: 0 0 45px rgba(255, 50, 150, 0.28);
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ORDER SUMMARY */
+        .order-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            background: rgba(255, 211, 106, 0.16);
+            border: 1px solid rgba(255, 211, 106, 0.35);
+            color: #ffd36a;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .amount-display {
+            font-size: 40px;
+            font-weight: 900;
+            color: #ffd36a;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 20px rgba(255, 211, 106, 0.35);
+            margin-bottom: 4px;
+        }
+
+        .order-meta {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 18px;
+        }
+
+        /* ALWAYS-VISIBLE PROMINENT QR CODE SECTION */
+        .qr-section {
+            background: rgba(0, 0, 0, 0.38);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 20px;
+            padding: 18px 14px;
+            margin-bottom: 18px;
+        }
+
+        .section-tag {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #ff91c7;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .qr-canvas-box {
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 16px;
+            display: inline-block;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+            margin-bottom: 12px;
+        }
+
+        #qrCanvas {
+            width: 190px;
+            height: 190px;
+            display: block;
+        }
+
+        .upi-id-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #7cffb2;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .upi-id-pill:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .copy-tag {
+            background: #10b981;
+            color: white;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        .payee-hint {
+            font-size: 11px;
+            color: #888;
+            margin-top: 6px;
+        }
+
+        /* DIRECT APP SHORTCUTS */
+        .apps-title {
+            font-size: 12px;
+            color: #bbb;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .apps-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .app-pill {
+            flex: 1;
+            padding: 11px 6px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .app-pill:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.15);
+        }
+
+        .app-pill.phonepe {
+            background: linear-gradient(135deg, #5f259f, #4a154b);
+            color: #e9d5ff;
+        }
+
+        .app-pill.gpay {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            color: #93c5fd;
+        }
+
+        .app-pill.paytm {
+            background: linear-gradient(135deg, #002e6e, #00b9f1);
+        }
+
+        /* STEP 2: UTR SUBMISSION (ANTI-CHEAT) */
+        .utr-section {
+            background: rgba(0, 0, 0, 0.40);
+            border: 1px solid rgba(255, 114, 182, 0.28);
+            border-radius: 20px;
+            padding: 20px 16px;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .utr-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #ffd36a;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .utr-desc {
+            font-size: 12px;
+            color: #ccc;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .utr-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .utr-input {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1.5px solid rgba(255, 255, 255, 0.22);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .utr-input:focus {
+            border-color: #ff72b6;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 14px rgba(255, 114, 182, 0.35);
+        }
+
+        .utr-input::placeholder {
+            color: #777;
+            font-weight: normal;
+            letter-spacing: normal;
+            font-size: 13px;
+        }
+
+        .btn-submit-utr {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-submit-utr:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-submit-utr:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* PENDING STATUS NOTICE */
+        .pending-status-card {
+            display: none;
+            background: rgba(255, 211, 106, 0.12);
+            border: 1px solid rgba(255, 211, 106, 0.35);
+            border-radius: 14px;
+            padding: 14px;
+            margin-top: 14px;
+            text-align: center;
+        }
+
+        .pending-pulse {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ffd36a;
+            box-shadow: 0 0 10px #ffd36a;
+            margin-right: 6px;
+            animation: pulseDot 1.4s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(16, 185, 129, 0.95);
+            color: white;
+            padding: 12px 22px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            display: none;
+            z-index: 9999;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.2s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="gateway-header">
+        <div class="brand">
+            <img src="/static/images/logo.jpeg" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
+            <span>DEEDI PAY</span>
+        </div>
+        <a href="/coins" class="cancel-btn">✕ Cancel</a>
+    </header>
+
+    <main class="checkout-card">
+
+        <!-- PACKAGE DETAILS -->
+        <div class="order-badge">
+            🪙 <span th:text="${#numbers.formatInteger(order.coins, 0, 'COMMA')}">5,000</span> Coins
+        </div>
+
+        <div class="amount-display">
+            ₹<span th:text="${order.amount}">199</span>
+        </div>
+
+        <div class="order-meta">
+            Order Ref: <strong th:text="${order.orderId}">ORDER_123</strong>
+        </div>
+
+        <!-- 1️⃣ PROMINENT QR CODE SECTION (ALWAYS VISIBLE) -->
+        <div class="qr-section">
+            <div class="section-tag">
+                📷 Scan QR to Pay via Any UPI App
+            </div>
+
+            <div class="qr-canvas-box">
+                <canvas id="qrCanvas"></canvas>
+            </div>
+
+            <div>
+                <div class="upi-id-pill" onclick="copyUPI()" title="Click to copy UPI ID">
+                    <span>UPI: <strong th:text="${upiId}">deedi@upi</strong></span>
+                    <span class="copy-tag">📋 Copy</span>
+                </div>
+            </div>
+
+            <div class="payee-hint">
+                Payee: <strong th:text="${payeeName}">DEEDI AI</strong> • Supports GPay, PhonePe, Paytm, BHIM & All Banks
+            </div>
+        </div>
+
+        <!-- DIRECT APP SHORTCUTS (FOR MOBILE BROWSERS) -->
+        <div class="apps-title">
+            Or Tap to Open Your Payment App:
+        </div>
+
+        <div class="apps-row">
+            <a th:href="${phonepeUri}" class="app-pill phonepe" onclick="trackAppClick('PhonePe')">
+                🟣 PhonePe
+            </a>
+            <a th:href="${gpayUri}" class="app-pill gpay" onclick="trackAppClick('GPay')">
+                🟢 Google Pay
+            </a>
+            <a th:href="${paytmUri}" class="app-pill paytm" onclick="trackAppClick('Paytm')">
+                🔵 Paytm
+            </a>
+        </div>
+
+        <!-- 2️⃣ VERIFICATION / UTR INPUT SECTION (NO FAKE FREE COINS) -->
+        <div class="utr-section">
+            <div class="utr-title">
+                🔢 Step 2: Enter Transaction Ref / UTR
+            </div>
+            <p class="utr-desc">
+                After paying in your UPI app, copy the <strong>12-digit UTR / UPI Ref No.</strong> from the payment receipt and enter it below to confirm:
+            </p>
+
+            <div class="utr-input-group">
+                <input type="text"
+                       id="utrInput"
+                       class="utr-input"
+                       maxlength="20"
+                       th:value="${order.utrNumber}"
+                       placeholder="e.g. 402318928371 (12 digits)">
+
+                <button id="submitBtn" class="btn-submit-utr" onclick="submitUTR()">
+                    ✅ Submit UTR for Verification
+                </button>
+            </div>
+
+            <!-- STATUS BOX WHEN SUBMITTED -->
+            <div id="pendingBox" class="pending-status-card"
+                 th:style="${order.utrNumber != null and !order.utrNumber.isEmpty()} ? 'display: block;' : 'display: none;'">
+                <p style="font-size: 13px; color: #ffd36a; font-weight: 700; margin-bottom: 4px;">
+                    <span class="pending-pulse"></span> Payment Under Verification
+                </p>
+                <p style="font-size: 12px; color: #ddd; line-height: 1.4;">
+                    UTR: <strong id="submittedUtrDisplay" th:text="${order.utrNumber}">-</strong>
+                    <br>Once verified, your coins will be automatically credited and this page will redirect!
+                </p>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script th:inline="javascript">
+        const orderId = /*[[${order.orderId}]]*/ "ORDER_123";
+        const upiUri = /*[[${upiUri}]]*/ "upi://pay";
+        const upiId = /*[[${upiId}]]*/ "deedi@upi";
+        const isAutoApprove = /*[[${autoApprove}]]*/ false;
+
+        let isSubmitting = false;
+
+        // 1️⃣ GENERATE ALWAYS-VISIBLE QR CODE ON LOAD
+        window.addEventListener("DOMContentLoaded", () => {
+            generateQR();
+            startPollingStatus();
+        });
+
+        // 2️⃣ DRAW QR CODE TO CANVAS WITH RETRY/FALLBACK
+        function generateQR() {
+            const canvas = document.getElementById("qrCanvas");
+            if (!canvas) return;
+
+            const size = 190;
+            const ctx = canvas.getContext("2d");
+            canvas.width = size;
+            canvas.height = size;
+
+            // Render fallback loader
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, size, size);
+            ctx.fillStyle = "#888888";
+            ctx.font = "12px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("Generating QR...", size / 2, size / 2);
+
+            const qrImg = new Image();
+            qrImg.crossOrigin = "anonymous";
+            qrImg.onload = function() {
+                ctx.clearRect(0, 0, size, size);
+                ctx.drawImage(qrImg, 0, 0, size, size);
+            };
+            qrImg.onerror = function() {
+                // Secondary QR API fallback
+                const fallbackImg = new Image();
+                fallbackImg.onload = function() {
+                    ctx.clearRect(0, 0, size, size);
+                    ctx.drawImage(fallbackImg, 0, 0, size, size);
+                };
+                fallbackImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=" + encodeURIComponent(upiUri);
+            };
+            qrImg.src = "https://quickchart.io/qr?text=" + encodeURIComponent(upiUri) + "&size=190&margin=1";
+        }
+
+        // 3️⃣ COPY UPI ID HELPER
+        function copyUPI() {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(upiId).then(() => {
+                    showToast("✅ UPI ID Copied: " + upiId);
+                }).catch(() => {
+                    promptCopy();
+                });
+            } else {
+                promptCopy();
+            }
+        }
+
+        function promptCopy() {
+            showToast("UPI ID: " + upiId);
+        }
+
+        function trackAppClick(appName) {
+            console.log("Opening " + appName + " with URI:", upiUri);
+        }
+
+        // 4️⃣ DETECT WHEN USER RETURNS FROM APP AND PROMPT FOR UTR
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) {
+                const utrInput = document.getElementById("utrInput");
+                if (utrInput && !utrInput.value.trim()) {
+                    showToast("📱 Welcome back! Please enter the 12-digit UTR from your receipt.");
+                    utrInput.focus();
+                }
+            }
+        });
+
+        // 5️⃣ SUBMIT UTR FOR GENUINE VERIFICATION
+        async function submitUTR() {
+            if (isSubmitting) return;
+
+            const utrInput = document.getElementById("utrInput");
+            const utrVal = utrInput.value.trim();
+
+            if (!utrVal || utrVal.length < 6) {
+                alert("Please enter the 12-digit UTR / UPI Reference number from your payment app receipt.");
+                utrInput.focus();
+                return;
+            }
+
+            isSubmitting = true;
+            const submitBtn = document.getElementById("submitBtn");
+            submitBtn.disabled = true;
+            submitBtn.innerText = "⏳ Verifying UTR...";
+
+            try {
+                const response = await fetch("/api/payment/submit-utr?orderId=" + encodeURIComponent(orderId) + "&utr=" + encodeURIComponent(utrVal), {
+                    method: "POST"
+                });
+
+                const data = await response.json();
+                console.log("Submit UTR response:", data);
+
+                if (response.ok && data.success) {
+                    if (data.status === "SUCCESS") {
+                        showToast("🎉 Payment Approved! Redirecting...");
+                        setTimeout(() => {
+                            window.location.href = data.redirectUrl || ("/payment/success?orderId=" + orderId);
+                        }, 700);
+                    } else {
+                        // Pending verification by admin
+                        showToast("✅ UTR Submitted! Verification in progress.");
+                        submitBtn.innerText = "✅ UTR Submitted";
+
+                        const pendingBox = document.getElementById("pendingBox");
+                        const displayUtr = document.getElementById("submittedUtrDisplay");
+                        if (displayUtr) displayUtr.innerText = utrVal;
+                        if (pendingBox) pendingBox.style.display = "block";
+                    }
+                } else {
+                    isSubmitting = false;
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "✅ Submit UTR for Verification";
+                    alert(data.error || "Unable to submit UTR. Please check the number and try again.");
+                }
+            } catch (err) {
+                console.error("UTR submission error:", err);
+                isSubmitting = false;
+                submitBtn.disabled = false;
+                submitBtn.innerText = "✅ Submit UTR for Verification";
+                alert("Network error while submitting UTR. Please try again.");
+            }
+        }
+
+        // 6️⃣ LIVE STATUS POLLING (WHEN ADMIN APPROVES, PAGE REDIRECTS TO SUCCESS)
+        function startPollingStatus() {
+            setInterval(async () => {
+                try {
+                    const res = await fetch("/api/payment/status?orderId=" + encodeURIComponent(orderId));
+                    const data = await res.json();
+
+                    if (data.success && data.status === "SUCCESS") {
+                        showToast("🎉 Payment Confirmed! Adding your coins...");
+                        setTimeout(() => {
+                            window.location.href = "/payment/success?orderId=" + orderId;
+                        }, 600);
+                    }
+                } catch (e) {
+                    // Ignore silent network errors
+                }
+            }, 2500);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.style.display = "block";
+            setTimeout(() => {
+                toast.style.display = "none";
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

@@ -3,7 +3,7 @@
 
 <head>
 	
-	<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+	
 	
     <meta charset="UTF-8">
 
@@ -1149,12 +1149,11 @@
     </section>
 
 
-    <h2 class="section-title">
+        <h2 class="section-title" th:if="${profiles != null and !profiles.isEmpty()}">
         ✨ best matches for you
     </h2>
 
-
-    <section class="profiles">
+    <section class="profiles" th:if="${profiles != null and !profiles.isEmpty()}">
 
     <article class="profile-card"
              th:each="profile : ${profiles}">
@@ -1163,7 +1162,7 @@
 
         <img th:src="@{'/api/image/' + ${profile.profileImage}}"
      th:alt="${profile.name}"
-     onerror="this.parentElement.innerHTML='👩'">
+     onerror="this.src='/static/images/logo.jpeg'">
 
             <span class="online"
                   th:if="${profile.online}">
@@ -1209,9 +1208,15 @@
 
         </div>
 
-    </article>
+        </article>
 
 </section>
+
+    <div class="empty-home-state" th:if="${profiles == null || profiles.isEmpty()}" style="text-align: center; padding: 70px 20px; color: #777;">
+        <div style="font-size: 52px; margin-bottom: 15px;">🌸</div>
+        <h3 style="font-size: 20px; color: #3a2030; margin-bottom: 8px; font-weight: 700;">No Companions Available</h3>
+        <p style="font-size: 14px; color: #888; max-width: 340px; margin: 0 auto 20px;">AI companions will appear here once added from the admin dashboard.</p>
+    </div>
 </main>
 
 	<!-- RECHARGE POPUP -->

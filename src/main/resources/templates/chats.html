@@ -369,7 +369,7 @@
 <header class="header">
 
     <div class="brand">
-        <img src="/static/images/datevibe-logo.png" 
+        <img src="/static/images/logo.jpeg" 
              alt="DateVibe" 
              class="brand-logo"
              onerror="this.style.display='none'; this.parentElement.innerHTML='💗 DateVibe'">
@@ -396,8 +396,7 @@
 
     <!-- AI COMPANIONS -->
 
-    <section>
-
+        <section th:if="${profiles != null and !profiles.isEmpty()}">
         <a th:each="profile : ${profiles}"
            th:href="@{'/chat/' + ${profile.id}}"
            class="chat-card">
@@ -412,7 +411,7 @@
                              and !profile.profileImage.isEmpty()}"
                     th:src="@{'/api/image/' + ${profile.profileImage}}"
                     th:alt="${profile.name}"
-                    onerror="this.parentElement.innerHTML='👩'">
+                    onerror="this.src='/static/images/logo.jpeg'">
 
                 <span
                     th:unless="${profile.profileImage != null
@@ -477,9 +476,13 @@
 
         </a>
 
-    </section>
+        </section>
 
-
+    <div class="empty-state" th:if="${profiles == null || profiles.isEmpty()}" style="text-align: center; padding: 60px 20px; color: #888;">
+        <div style="font-size: 48px; margin-bottom: 14px;">?</div>
+        <div style="font-size: 18px; font-weight: bold; color: #3a2030; margin-bottom: 6px;">No Companions Available</div>
+        <p style="font-size: 13px; color: #888;">AI companions will appear here once added from the admin dashboard.</p>
+    </div>
 </main>
 
 

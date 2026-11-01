@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTS ai_video_chat;
+USE ai_video_chat;
+SHOW DATABASES;

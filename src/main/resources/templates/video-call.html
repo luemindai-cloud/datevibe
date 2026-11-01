@@ -410,7 +410,7 @@
                     th:if="${profile.profileImage != null and !profile.profileImage.isEmpty()}"
                     th:src="@{'/api/image/' + ${profile.profileImage}}"
                     th:alt="${profile.name}"
-                    onerror="this.parentElement.innerHTML='👩'">
+                    onerror="this.src='/static/images/logo.jpeg'">
 
                 <div
                     th:unless="${profile.profileImage != null and !profile.profileImage.isEmpty()}"

@@ -15,4 +15,6 @@ public interface PaymentOrderRepository
 
     List<PaymentOrder> findByStatusOrderByCreatedAtDesc(String status);
 
+    boolean existsByUtrNumber(String utrNumber);
+
 }

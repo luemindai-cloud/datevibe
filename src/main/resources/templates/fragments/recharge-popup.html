@@ -531,9 +531,8 @@
         }
 
 
-        async function startRecharge() {
-
-            console.log("🔥 RECHARGE NOW clicked");
+                async function startRecharge() {
+            console.log("💳 RECHARGE NOW clicked");
             console.log("Selected price:", selectedPrice);
             console.log("Selected coins:", selectedCoins);
 
@@ -542,69 +541,51 @@
                 return;
             }
 
-            try {
+            const rechargeBtn = document.getElementById("rechargeButton");
+            if (rechargeBtn) {
+                rechargeBtn.innerText = "⏳ Opening Checkout...";
+                rechargeBtn.disabled = true;
+            }
 
-                // 1️⃣ Create payment order on our server
+            try {
                 const response = await fetch(
                     "/api/payment/create?packageId=" + selectedPrice,
-                    {
-                        method: "POST"
-                    }
+                    { method: "POST" }
                 );
-
-                console.log("Backend status:", response.status);
 
                 const data = await response.json();
+                console.log("Payment order created:", data);
 
-                console.log("Backend response:", data);
-
-                if (!response.ok) {
-
-                    alert(
-                        data.error ||
-                        "Unable to create payment."
-                    );
-
+                if (!response.ok || !data.success) {
+                    if (data.redirectUrl) {
+                        window.location.href = data.redirectUrl;
+                        return;
+                    }
+                    alert(data.error || "Unable to start payment.");
+                    if (rechargeBtn) {
+                        rechargeBtn.innerText = "💳 RECHARGE NOW";
+                        rechargeBtn.disabled = false;
+                    }
                     return;
                 }
 
-                if (!data.paymentSessionId) {
-
-                    console.error(
-                        "Payment session missing:",
-                        data
-                    );
-
-                    alert(
-                        "Cashfree payment session was not received."
-                    );
-
-                    return;
+                if (data.checkoutUrl) {
+                    // Navigate to the new styled UPI payment gateway interface
+                    window.location.href = data.checkoutUrl;
+                } else {
+                    alert("Payment checkout URL was not received.");
+                    if (rechargeBtn) {
+                        rechargeBtn.innerText = "💳 RECHARGE NOW";
+                        rechargeBtn.disabled = false;
+                    }
                 }
-
-                console.log(
-                    "Opening Cashfree checkout 🚀"
-                );
-
-                // 2️⃣ Open Cashfree Sandbox Checkout
-                const cashfree = Cashfree({
-                    mode: "sandbox"
-                });
-
-                cashfree.checkout({
-                    paymentSessionId: data.paymentSessionId
-                });
-
             } catch (error) {
-
-                console.error(
-                    "Payment error:",
-                    error
-                );
-
-                alert(
-                    "Unable to open Cashfree payment."
-                );
+                console.error("Payment error:", error);
+                alert("Something went wrong while initiating payment.");
+                if (rechargeBtn) {
+                    rechargeBtn.innerText = "💳 RECHARGE NOW";
+                    rechargeBtn.disabled = false;
+                }
             }
         }
             

@@ -474,14 +474,18 @@
             </div>
 
 
-            <div class="payment-info">
-
-                🧾 Cashfree Order ID:
-
+                        <div class="payment-info">
+                🧾 Order ID:
                 <strong th:text="${payment.orderId}">
                     ORDER_ID
                 </strong>
+            </div>
 
+            <div class="payment-info" th:if="${payment.utrNumber != null and !payment.utrNumber.isEmpty()}">
+                🔢 UTR / Ref:
+                <strong style="color: #ffd36a;" th:text="${payment.utrNumber}">
+                    UTR123456
+                </strong>
             </div>
 
 

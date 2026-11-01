@@ -1,386 +1,289 @@
 package com.aivideochat.controller;
 
-import java.util.Map;
-import java.util.UUID;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.aivideochat.entity.PaymentOrder;
 import com.aivideochat.entity.User;
 import com.aivideochat.repository.PaymentOrderRepository;
 import com.aivideochat.repository.UserRepository;
-import com.aivideochat.service.CashfreeService;
-import com.cashfree.pg.model.OrderEntity;
+import com.aivideochat.service.PaymentService;
+import com.aivideochat.service.PaymentService.PackageInfo;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
+import java.util.Map;
+import java.util.UUID;
 
-import java.util.List;
-
-import com.cashfree.pg.model.PaymentEntity;
-
-import java.math.BigDecimal;
-
-@RestController
+@Controller
 public class PaymentController {
 
-    private final CashfreeService cashfreeService;
+    private final PaymentService paymentService;
     private final UserRepository userRepository;
     private final PaymentOrderRepository paymentOrderRepository;
 
     public PaymentController(
-            CashfreeService cashfreeService,
+            PaymentService paymentService,
             UserRepository userRepository,
             PaymentOrderRepository paymentOrderRepository) {
 
-        this.cashfreeService = cashfreeService;
+        this.paymentService = paymentService;
         this.userRepository = userRepository;
         this.paymentOrderRepository = paymentOrderRepository;
     }
 
+    // ========================================================
+    // CREATE PAYMENT ORDER (API)
+    // ========================================================
     @PostMapping("/api/payment/create")
+    @ResponseBody
     public ResponseEntity<?> createPayment(
             @RequestParam String packageId,
-            HttpSession session,
-            HttpServletRequest request) {
+            HttpSession session) {
 
-        // Get logged-in user
         Long userId = (Long) session.getAttribute("userId");
-
         if (userId == null) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(Map.of(
-                            "error",
-                            "User is not logged in"
-                    ));
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", "User is not logged in",
+                    "redirectUrl", "/quick-login"
+            ));
         }
 
-        // Make sure user actually exists
-        User user = userRepository.findById(userId)
-                .orElse(null);
-
+        User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(Map.of(
-                            "error",
-                            "User not found"
-                    ));
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", "User not found"
+            ));
         }
 
-        // Package details decided by SERVER
-        int amount;
-        int coins;
-
-        switch (packageId) {
-
-            case "100":
-                amount = 100;
-                coins = 3000;
-                break;
-
-            case "199":
-                amount = 199;
-                coins = 5000;
-                break;
-
-            case "399":
-                amount = 399;
-                coins = 10000;
-                break;
-
-            case "1599":
-                amount = 1599;
-                coins = 50000;
-                break;
-
-            default:
-                return ResponseEntity
-                        .badRequest()
-                        .body(Map.of(
-                                "error",
-                                "Invalid package"
-                        ));
+        PackageInfo pkg = paymentService.getPackageInfo(packageId);
+        if (pkg == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", "Invalid package selection"
+            ));
         }
 
-        // Generate unique Cashfree order ID
-        String orderId =
-                "ORDER_" + UUID.randomUUID();
+        String orderId = "DEEDI_" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
 
-        try {
+        PaymentOrder paymentOrder = new PaymentOrder(
+                userId,
+                orderId,
+                pkg.amount(),
+                pkg.coins(),
+                paymentService.getUpiId()
+        );
 
-            // Save payment as PENDING
-            PaymentOrder paymentOrder =
-                    new PaymentOrder(
-                            userId,
-                            orderId,
-                            amount,
-                            coins
-                    );
+        paymentOrderRepository.save(paymentOrder);
 
-            paymentOrderRepository.save(paymentOrder);
+        String upiUri = paymentService.buildUpiUri(pkg.amount(), orderId);
+        String checkoutUrl = "/payment/checkout?orderId=" + orderId;
 
-            // Get the request base URL dynamically
-            String baseUrl = getBaseUrl(request);
-            
-            // Create Cashfree order with dynamic return URL
-            OrderEntity order =
-                    cashfreeService.createOrder(
-                            orderId,
-                            amount,
-                            userId,
-                            baseUrl
-                    );
-
-            // Send payment session ID to frontend
-            return ResponseEntity.ok(
-                    Map.of(
-                            "orderId", order.getOrderId(),
-                            "paymentSessionId",
-                                    order.getPaymentSessionId()
-                    )
-            );
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            return ResponseEntity
-                    .internalServerError()
-                    .body(Map.of(
-                            "error",
-                            "Unable to create payment order"
-                    ));
-        }
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "orderId", orderId,
+                "amount", pkg.amount(),
+                "coins", pkg.coins(),
+                "upiId", paymentService.getUpiId(),
+                "payeeName", paymentService.getPayeeName(),
+                "upiUri", upiUri,
+                "checkoutUrl", checkoutUrl
+        ));
     }
-    
-    /**
-     * Extract base URL from request (handles proxies like Cloudflare)
-     */
-    private String getBaseUrl(HttpServletRequest request) {
-        
-        // Check for X-Forwarded-Proto header (set by proxies like Cloudflare)
-        String scheme = request.getHeader("X-Forwarded-Proto");
-        if (scheme == null || scheme.isEmpty()) {
-            scheme = request.getScheme();
+
+    // ========================================================
+    // CHECKOUT WINDOW / PAGE
+    // ========================================================
+    @GetMapping("/payment/checkout")
+    public String showCheckoutPage(
+            @RequestParam("orderId") String orderId,
+            HttpSession session,
+            Model model) {
+
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/quick-login";
         }
-        
-        // Check for X-Forwarded-Host header (set by proxies)
-        String host = request.getHeader("X-Forwarded-Host");
-        if (host == null || host.isEmpty()) {
-            host = request.getHeader("Host");
+
+        PaymentOrder order = paymentOrderRepository.findByOrderId(orderId).orElse(null);
+        if (order == null) {
+            return "redirect:/coins";
         }
-        
-        String baseUrl = scheme + "://" + host;
-        
-        System.out.println("========== DYNAMIC BASE URL ==========");
-        System.out.println("Scheme: " + scheme);
-        System.out.println("Host: " + host);
-        System.out.println("Base URL: " + baseUrl);
-        System.out.println("=====================================");
-        
-        return baseUrl;
+
+        // If already completed, redirect directly to success page
+        if ("SUCCESS".equalsIgnoreCase(order.getStatus())) {
+            return "redirect:/payment/success?orderId=" + orderId;
+        }
+
+        User user = userRepository.findById(userId).orElse(null);
+
+        String upiId = order.getUpiId() != null ? order.getUpiId() : paymentService.getUpiId();
+        String payeeName = paymentService.getPayeeName();
+
+        model.addAttribute("order", order);
+        model.addAttribute("user", user);
+        model.addAttribute("upiId", upiId);
+        model.addAttribute("payeeName", payeeName);
+        model.addAttribute("autoApprove", paymentService.isAutoApprove());
+        model.addAttribute("upiUri", paymentService.buildUpiUri(order.getAmount(), order.getOrderId()));
+        model.addAttribute("gpayUri", paymentService.buildGpayUri(order.getAmount(), order.getOrderId()));
+        model.addAttribute("phonepeUri", paymentService.buildPhonepeUri(order.getAmount(), order.getOrderId()));
+        model.addAttribute("paytmUri", paymentService.buildPaytmUri(order.getAmount(), order.getOrderId()));
+
+        return "payment-checkout";
     }
-    
-    @PostMapping("/api/payment/verify")
-    public ResponseEntity<?> verifyPayment(
+
+    // ========================================================
+    // SUBMIT UTR FOR VERIFICATION (API)
+    // ========================================================
+    @PostMapping("/api/payment/submit-utr")
+    @ResponseBody
+    public ResponseEntity<?> submitUtr(
             @RequestParam String orderId,
+            @RequestParam String utr,
             HttpSession session) {
 
         Long userId = (Long) session.getAttribute("userId");
-
         if (userId == null) {
-            return ResponseEntity.badRequest().body(
-                    Map.of("error", "User is not logged in"));
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", "User is not logged in"
+            ));
         }
 
-        try {
+        PaymentOrder order = paymentOrderRepository.findByOrderId(orderId).orElse(null);
+        if (order == null || !order.getUserId().equals(userId)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", "Order not found"
+            ));
+        }
 
-            // Find our payment order
-            PaymentOrder paymentOrder =
-                    paymentOrderRepository
-                            .findByOrderId(orderId)
-                            .orElse(null);
+        // If already completed, redirect
+        if ("SUCCESS".equalsIgnoreCase(order.getStatus())) {
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "status", "SUCCESS",
+                    "redirectUrl", "/payment/success?orderId=" + orderId
+            ));
+        }
 
-            if (paymentOrder == null) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("error", "Payment order not found"));
+        String cleanUtr = (utr != null) ? utr.trim() : "";
+        if (cleanUtr.length() < 6 || cleanUtr.length() > 25) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", "Please enter a valid UPI Reference / UTR Number (minimum 6 digits)."
+            ));
+        }
+
+        // Prevent duplicate UTR abuse across orders
+        if (paymentOrderRepository.existsByUtrNumber(cleanUtr) && !cleanUtr.equalsIgnoreCase(order.getUtrNumber())) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", "This UTR number has already been used for another payment. Please verify your reference number."
+            ));
+        }
+
+        order.setUtrNumber(cleanUtr);
+
+        // Check if admin enabled auto-approve or if manual admin approval is required
+        if (paymentService.isAutoApprove()) {
+            order.setStatus("SUCCESS");
+            paymentOrderRepository.save(order);
+
+            User user = userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                user.setCoins(user.getCoins() + order.getCoins());
+                userRepository.save(user);
             }
 
-            // Make sure this order belongs to logged-in user
-            if (!paymentOrder.getUserId().equals(userId)) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("error", "Invalid payment order"));
-            }
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "status", "SUCCESS",
+                    "redirectUrl", "/payment/success?orderId=" + orderId
+            ));
+        } else {
+            // Safe anti-cheat mode: saved as PENDING for admin review
+            order.setStatus("PENDING");
+            paymentOrderRepository.save(order);
 
-            // Don't credit coins twice
-            if ("SUCCESS".equalsIgnoreCase(
-                    paymentOrder.getStatus())) {
-
-                return ResponseEntity.ok(
-                        Map.of(
-                                "success", true,
-                                "message", "Payment already verified"
-                        )
-                );
-            }
-
-            // Ask Cashfree for all payments for this order
-            List<PaymentEntity> payments =
-                    cashfreeService.fetchPayments(orderId);
-
-            System.out.println(
-                    "Cashfree payments found: "
-                    + payments.size()
-            );
-
-            PaymentEntity successfulPayment = null;
-
-            for (PaymentEntity payment : payments) {
-
-
-                System.out.println(
-                        "Payment status: "
-                        + payment.getPaymentStatus()
-                );
-
-                System.out.println(
-                        "Payment amount: "
-                        + payment.getPaymentAmount()
-                );
-
-                if ("SUCCESS".equalsIgnoreCase(
-                        String.valueOf(
-                                payment.getPaymentStatus()
-                        ))) {
-
-                    successfulPayment = payment;
-                    break;
-                }
-            }
-
-            // Payment has not succeeded yet
-            if (successfulPayment == null) {
-
-                return ResponseEntity.ok(
-                        Map.of(
-                                "success", false,
-                                "message",
-                                "Payment is not completed yet."
-                        )
-                );
-            }
-
-            // Verify the successful payment amount
-            BigDecimal paidAmount =
-                    successfulPayment.getPaymentAmount();
-
-            BigDecimal expectedAmount =
-                    BigDecimal.valueOf(
-                            paymentOrder.getAmount()
-                    );
-
-            if (paidAmount == null ||
-                    paidAmount.compareTo(expectedAmount) != 0) {
-
-                System.out.println(
-                        "⚠️ Payment amount mismatch!"
-                );
-
-                return ResponseEntity.badRequest().body(
-                        Map.of(
-                                "error",
-                                "Payment amount mismatch"
-                        )
-                );
-            }
-
-            // Get user
-            User user =
-                    userRepository.findById(userId)
-                            .orElse(null);
-
-            if (user == null) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("error", "User not found"));
-            }
-
-            // Add package coins
-            user.setCoins(
-                    user.getCoins()
-                            + paymentOrder.getCoins()
-            );
-
-            userRepository.save(user);
-
-            // Mark our order as successfully verified
-            paymentOrder.setStatus("SUCCESS");
-
-            paymentOrderRepository.save(paymentOrder);
-
-            System.out.println(
-                    "🎉 Payment verified successfully!"
-            );
-
-            System.out.println(
-                    "🪙 Coins added: "
-                    + paymentOrder.getCoins()
-            );
-
-            return ResponseEntity.ok(
-                    Map.of(
-                            "success", true,
-                            "coins", paymentOrder.getCoins(),
-                            "message",
-                            "Payment verified and coins added"
-                    )
-            );
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            return ResponseEntity
-                    .internalServerError()
-                    .body(
-                            Map.of(
-                                    "error",
-                                    "Unable to verify payment"
-                            )
-                    );
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "status", "PENDING",
+                    "message", "UTR submitted! Your transaction is under verification. Coins will be credited once confirmed by admin."
+            ));
         }
     }
-    
-    @GetMapping("/payment-return")
-    public ResponseEntity<?> paymentReturn(
-            @RequestParam("order_id") String orderId,
-            HttpSession session) {
 
-        System.out.println(
-                "🔄 Cashfree returned with order ID: "
-                + orderId
-        );
+    // ========================================================
+    // PAYMENT SUCCESS PAGE
+    // ========================================================
+    @GetMapping("/payment/success")
+    public String showSuccessPage(
+            @RequestParam("orderId") String orderId,
+            HttpSession session,
+            Model model) {
 
-        // Verify payment on our server
-        ResponseEntity<?> verification =
-                verifyPayment(orderId, session);
+        Long userId = (Long) session.getAttribute("userId");
+        PaymentOrder order = paymentOrderRepository.findByOrderId(orderId).orElse(null);
 
-        System.out.println(
-                "💳 Payment verification result: "
-                + verification.getBody()
-        );
+        if (order == null) {
+            return "redirect:/home";
+        }
 
-        // Send user back to Home
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .header("Location", "/home")
-                .build();
+        User user = null;
+        if (userId != null) {
+            user = userRepository.findById(userId).orElse(null);
+        } else if (order.getUserId() != null) {
+            user = userRepository.findById(order.getUserId()).orElse(null);
+        }
+
+        model.addAttribute("order", order);
+        model.addAttribute("user", user);
+
+        return "payment-success";
+    }
+
+    // ========================================================
+    // PAYMENT FAILED / CANCELLED PAGE
+    // ========================================================
+    @GetMapping("/payment/failed")
+    public String showFailedPage(
+            @RequestParam(value = "orderId", required = false) String orderId,
+            Model model) {
+
+        if (orderId != null) {
+            PaymentOrder order = paymentOrderRepository.findByOrderId(orderId).orElse(null);
+            model.addAttribute("order", order);
+        }
+
+        return "payment-failed";
+    }
+
+    // ========================================================
+    // ORDER STATUS CHECK (API for live polling)
+    // ========================================================
+    @GetMapping("/api/payment/status")
+    @ResponseBody
+    public ResponseEntity<?> getPaymentStatus(@RequestParam String orderId) {
+        PaymentOrder order = paymentOrderRepository.findByOrderId(orderId).orElse(null);
+        if (order == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", "Order not found"
+            ));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "orderId", order.getOrderId(),
+                "status", order.getStatus(),
+                "amount", order.getAmount(),
+                "coins", order.getCoins(),
+                "utrNumber", order.getUtrNumber() != null ? order.getUtrNumber() : ""
+        ));
     }
 }

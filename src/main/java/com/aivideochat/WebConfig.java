@@ -12,14 +12,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-        // Get the project root (working directory)
         String projectRoot = System.getProperty("user.dir");
-        
-        // Build absolute paths for uploads
         File imageDir = new File(projectRoot, "deedi-uploads/images");
         File videoDir = new File(projectRoot, "deedi-uploads/videos");
 
-        // Ensure directories exist
         if (!imageDir.exists()) {
             imageDir.mkdirs();
         }
@@ -27,32 +23,22 @@ public class WebConfig implements WebMvcConfigurer {
             videoDir.mkdirs();
         }
 
-        // Convert to proper file URI format
-        // file:/// format with forward slashes for Windows compatibility
-        String imagePath = "file:///" + imageDir.getAbsolutePath().replace("\\", "/") + "/";
-        String videoPath = "file:///" + videoDir.getAbsolutePath().replace("\\", "/") + "/";
+        String imageLocation = imageDir.toURI().toString();
+        String videoLocation = videoDir.toURI().toString();
 
-        System.out.println("========== RESOURCE PATHS ==========");
-        System.out.println("IMAGE UPLOAD PATH = " + imagePath);
-        System.out.println("VIDEO UPLOAD PATH = " + videoPath);
-        System.out.println("IMAGE DIR EXISTS = " + imageDir.exists());
-        System.out.println("VIDEO DIR EXISTS = " + videoDir.exists());
-        System.out.println("====================================");
-
-        // Static resources (CSS, JS, images, logos) - map /static/** to classpath:/static/
+        // Static resources (CSS, JS, images, logos)
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/")
                 .setCachePeriod(0)
                 .resourceChain(true);
 
-        // AI profile images - map /api/image/** to deedi-uploads/images/
+        // Uploaded images & videos
         registry.addResourceHandler("/api/image/**")
-                .addResourceLocations(imagePath)
+                .addResourceLocations(imageLocation)
                 .setCachePeriod(3600);
 
-        // AI profile videos - map /api/video/** to deedi-uploads/videos/
         registry.addResourceHandler("/api/video/**")
-                .addResourceLocations(videoPath)
+                .addResourceLocations(videoLocation)
                 .setCachePeriod(3600);
     }
 }

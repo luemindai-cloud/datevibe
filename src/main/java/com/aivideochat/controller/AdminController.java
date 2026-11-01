@@ -6,6 +6,7 @@ import com.aivideochat.entity.PaymentOrder;
 import com.aivideochat.repository.AdminRepository;
 import com.aivideochat.repository.UserRepository;
 import com.aivideochat.repository.PaymentOrderRepository;
+import com.aivideochat.service.PaymentService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -14,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,21 +25,23 @@ public class AdminController {
     private final AdminRepository adminRepository;
     private final UserRepository userRepository;
     private final PaymentOrderRepository paymentOrderRepository;
+    private final PaymentService paymentService;
 
     public AdminController(
             AdminRepository adminRepository,
             UserRepository userRepository,
-            PaymentOrderRepository paymentOrderRepository) {
+            PaymentOrderRepository paymentOrderRepository,
+            PaymentService paymentService) {
 
         this.adminRepository = adminRepository;
         this.userRepository = userRepository;
         this.paymentOrderRepository = paymentOrderRepository;
+        this.paymentService = paymentService;
     }
 
     // =========================
     // ADMIN LOGIN PAGE
     // =========================
-
     @GetMapping("/login")
     public String showAdminLogin() {
         return "admin/login";
@@ -48,7 +50,6 @@ public class AdminController {
     // =========================
     // ADMIN LOGIN
     // =========================
-
     @PostMapping("/login")
     public String adminLogin(
             @RequestParam String username,
@@ -92,7 +93,6 @@ public class AdminController {
     // =========================
     // ADMIN DASHBOARD
     // =========================
-
     @GetMapping("/dashboard")
     public String adminDashboard(
             HttpSession session,
@@ -106,61 +106,104 @@ public class AdminController {
                 "adminUsername",
                 session.getAttribute("adminUsername")
         );
+        model.addAttribute("currentUpiId", paymentService.getUpiId());
+        model.addAttribute("currentPayeeName", paymentService.getPayeeName());
+        model.addAttribute("autoApprove", paymentService.isAutoApprove());
 
         return "admin/dashboard";
     }
 
- // =========================
- // ADMIN USERS
- // =========================
+    // =========================
+    // UPDATE UPI SETTINGS
+    // =========================
+    @PostMapping("/settings/upi")
+    public String updateUpiSettings(
+            @RequestParam String upiId,
+            @RequestParam(required = false) String payeeName,
+            @RequestParam(value = "autoApprove", defaultValue = "false") boolean autoApprove,
+            HttpSession session) {
 
- @GetMapping("/users")
- public String adminUsers(
-         HttpSession session,
-         Model model) {
+        if (!isAdmin(session)) {
+            return "redirect:/admin/login";
+        }
 
-     if (!isAdmin(session)) {
-         return "redirect:/admin/login";
-     }
+        paymentService.setUpiId(upiId);
+        if (payeeName != null && !payeeName.isBlank()) {
+            paymentService.setPayeeName(payeeName);
+        }
+        paymentService.setAutoApprove(autoApprove);
 
-     List<User> users = userRepository.findAll();
+        return "redirect:/admin/dashboard?upiUpdated=true";
+    }
 
-     // Stores total successful payment amount for each user
-     Map<Long, Integer> totalPaidMap = new HashMap<>();
+    // =========================
+    // ADMIN USERS
+    // =========================
+    @GetMapping("/users")
+    public String adminUsers(
+            HttpSession session,
+            Model model) {
 
-     // Stores whether each user has successfully paid
-     Map<Long, Boolean> paidStatusMap = new HashMap<>();
+        if (!isAdmin(session)) {
+            return "redirect:/admin/login";
+        }
 
-     for (User user : users) {
+        List<User> users = userRepository.findAll();
 
-         List<PaymentOrder> payments =
-                 paymentOrderRepository
-                         .findByUserIdOrderByCreatedAtDesc(user.getId());
+        // Stores total successful payment amount for each user
+        Map<Long, Integer> totalPaidMap = new HashMap<>();
 
-         int totalPaid = 0;
+        // Stores whether each user has successfully paid
+        Map<Long, Boolean> paidStatusMap = new HashMap<>();
 
-         for (PaymentOrder payment : payments) {
+        for (User user : users) {
 
-             if ("SUCCESS".equalsIgnoreCase(payment.getStatus())) {
-                 totalPaid += payment.getAmount();
-             }
-         }
+            List<PaymentOrder> payments =
+                    paymentOrderRepository
+                            .findByUserIdOrderByCreatedAtDesc(user.getId());
 
-         totalPaidMap.put(user.getId(), totalPaid);
-         paidStatusMap.put(user.getId(), totalPaid > 0);
-     }
+            int totalPaid = 0;
 
-     model.addAttribute("users", users);
-     model.addAttribute("totalPaidMap", totalPaidMap);
-     model.addAttribute("paidStatusMap", paidStatusMap);
+            for (PaymentOrder payment : payments) {
 
-     return "admin/users";
- }
+                if ("SUCCESS".equalsIgnoreCase(payment.getStatus())) {
+                    totalPaid += payment.getAmount();
+                }
+            }
+
+            totalPaidMap.put(user.getId(), totalPaid);
+            paidStatusMap.put(user.getId(), totalPaid > 0);
+        }
+
+        model.addAttribute("users", users);
+        model.addAttribute("totalPaidMap", totalPaidMap);
+        model.addAttribute("paidStatusMap", paidStatusMap);
+
+        return "admin/users";
+    }
+
+    // =========================
+    // DELETE USER
+    // =========================
+    @PostMapping("/users/delete/{id}")
+    public String deleteUser(
+            @PathVariable Long id,
+            HttpSession session) {
+
+        if (!isAdmin(session)) {
+            return "redirect:/admin/login";
+        }
+
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+        }
+
+        return "redirect:/admin/users";
+    }
 
     // =========================
     // USER PAYMENT DETAILS
     // =========================
-
     @GetMapping("/users/{id}")
     public String userDetails(
             @PathVariable Long id,
@@ -199,11 +242,10 @@ public class AdminController {
 
         return "admin/user-details";
     }
-    
- // =========================
- // ALL PAYMENTS
- // =========================
 
+    // =========================
+    // ALL PAYMENTS
+    // =========================
     @GetMapping("/payments")
     public String adminPayments(
             HttpSession session,
@@ -229,7 +271,7 @@ public class AdminController {
             userMap.put(user.getId(), user);
         }
 
-        // 💰 Calculate total successful money received
+        // Calculate total successful money received
         int totalReceived = 0;
 
         for (PaymentOrder payment : payments) {
@@ -247,9 +289,35 @@ public class AdminController {
     }
 
     // =========================
+    // APPROVE PAYMENT MANUALLY
+    // =========================
+    @PostMapping("/payments/approve/{id}")
+    public String approvePayment(
+            @PathVariable Long id,
+            HttpSession session) {
+
+        if (!isAdmin(session)) {
+            return "redirect:/admin/login";
+        }
+
+        PaymentOrder order = paymentOrderRepository.findById(id).orElse(null);
+        if (order != null && !"SUCCESS".equalsIgnoreCase(order.getStatus())) {
+            order.setStatus("SUCCESS");
+            paymentOrderRepository.save(order);
+
+            User user = userRepository.findById(order.getUserId()).orElse(null);
+            if (user != null) {
+                user.setCoins(user.getCoins() + order.getCoins());
+                userRepository.save(user);
+            }
+        }
+
+        return "redirect:/admin/payments";
+    }
+
+    // =========================
     // ADMIN LOGOUT
     // =========================
-
     @GetMapping("/logout")
     public String adminLogout(
             HttpSession session) {
@@ -264,7 +332,6 @@ public class AdminController {
     // =========================
     // ADMIN SECURITY CHECK
     // =========================
-
     private boolean isAdmin(HttpSession session) {
 
         Boolean adminLoggedIn =

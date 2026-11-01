@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful! | DEEDI</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.25), transparent 45%),
+                radial-gradient(circle at 10% 80%, rgba(255, 79, 163, 0.18), transparent 40%),
+                #140711;
+            color: #fff;
+            padding: 30px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-card {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 36px 26px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.25);
+            animation: zoomIn 0.35s ease;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* SUCCESS ICON ANIMATION */
+        .icon-wrapper {
+            width: 86px;
+            height: 86px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.35));
+            border: 2px solid #34d399;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            box-shadow: 0 0 30px rgba(52, 211, 153, 0.4);
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #7cffb2;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #ddd;
+            margin-bottom: 24px;
+        }
+
+        /* REWARD HIGHLIGHT */
+        .reward-box {
+            background: rgba(255, 211, 106, 0.12);
+            border: 1px solid rgba(255, 211, 106, 0.35);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 22px;
+        }
+
+        .reward-amount {
+            font-size: 32px;
+            font-weight: 900;
+            color: #ffd36a;
+            text-shadow: 0 0 15px rgba(255, 211, 106, 0.4);
+        }
+
+        .reward-label {
+            font-size: 13px;
+            color: #ffe699;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* RECEIPT DETAILS */
+        .receipt {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            font-size: 13px;
+            color: #ccc;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .receipt-row:last-child {
+            border-bottom: none;
+        }
+
+        .receipt-row strong {
+            color: white;
+            font-weight: 600;
+        }
+
+        /* REDIRECT COUNTDOWN */
+        .countdown-box {
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #bbb;
+        }
+
+        .countdown-number {
+            color: #7cffb2;
+            font-weight: 700;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #7cffb2);
+            transition: width 1s linear;
+        }
+
+        /* ACTIONS */
+        .btn-home {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #ff4fa3, #e83f89);
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 20px rgba(232, 63, 137, 0.35);
+            transition: 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(232, 63, 137, 0.5);
+        }
+
+        .btn-coins {
+            display: inline-block;
+            color: #ff91c7;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-coins:hover {
+            background: rgba(255, 79, 163, 0.15);
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="success-card">
+
+        <div class="icon-wrapper">
+            ✓
+        </div>
+
+        <h1 class="title">Payment Successful!</h1>
+        <p class="subtitle">Thank you! Your coins have been added to your wallet.</p>
+
+        <div class="reward-box">
+            <div class="reward-amount">
+                +<span th:text="${#numbers.formatInteger(order.coins, 0, 'COMMA')}">5,000</span>
+            </div>
+            <div class="reward-label">🪙 Coins Credited Successfully!</div>
+        </div>
+
+        <div class="receipt">
+            <div class="receipt-row">
+                <span>Amount Paid</span>
+                <strong style="color: #ffd36a;">₹<span th:text="${order.amount}">199</span></strong>
+            </div>
+            <div class="receipt-row">
+                <span>Order ID</span>
+                <strong th:text="${order.orderId}">ORDER_123</strong>
+            </div>
+            <div class="receipt-row" th:if="${order.utrNumber != null and !order.utrNumber.isEmpty()}">
+                <span>UTR / UPI Ref</span>
+                <strong style="color: #7cffb2;" th:text="${order.utrNumber}">UTR123</strong>
+            </div>
+            <div class="receipt-row" th:if="${user != null}">
+                <span>Total Coin Balance</span>
+                <strong style="color: #ffd36a;">🪙 <span th:text="${#numbers.formatInteger(user.coins, 0, 'COMMA')}">5,000</span></strong>
+            </div>
+            <div class="receipt-row">
+                <span>Status</span>
+                <strong style="color: #7cffb2;">COMPLETED</strong>
+            </div>
+        </div>
+
+        <div class="countdown-box">
+            Redirecting to Home in <span id="countdown" class="countdown-number">5</span> seconds...
+            <div class="progress-bar-bg">
+                <div id="progressFill" class="progress-bar-fill"></div>
+            </div>
+        </div>
+
+        <a href="/home" class="btn-home">
+            🚀 Continue Chatting Now
+        </a>
+
+        <a href="/coins" class="btn-coins">
+            🪙 View Coin Wallet
+        </a>
+
+    </main>
+
+    <script>
+        let timeLeft = 5;
+        const countdownEl = document.getElementById("countdown");
+        const progressEl = document.getElementById("progressFill");
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            if (countdownEl) countdownEl.innerText = timeLeft;
+            if (progressEl) progressEl.style.width = (timeLeft / 5 * 100) + "%";
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                window.location.href = "/home";
+            }
+        }, 1000);
+    </script>
+</body>
+
+</html>

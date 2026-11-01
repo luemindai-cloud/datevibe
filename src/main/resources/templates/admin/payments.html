@@ -90,6 +90,90 @@
             color: #ff91c7;
         }
 
+        .total-card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+
+            margin-bottom: 30px;
+            padding: 25px;
+
+            border-radius: 22px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255, 105, 180, 0.25),
+                    rgba(255, 211, 106, 0.12)
+                );
+
+            border:
+                1px solid
+                rgba(255,255,255,0.25);
+
+            backdrop-filter: blur(18px);
+
+            box-shadow:
+                0 0 30px
+                rgba(255,50,150,0.20);
+
+            transition: 0.25s;
+        }
+
+        .total-card:hover {
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 0 40px
+                rgba(255,50,150,0.35);
+        }
+
+        .total-icon {
+            width: 65px;
+            height: 65px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 18px;
+
+            font-size: 32px;
+
+            background:
+                rgba(255,211,106,0.15);
+
+            border:
+                1px solid
+                rgba(255,211,106,0.30);
+        }
+
+        .total-content {
+            flex: 1;
+        }
+
+        .total-label {
+            font-size: 15px;
+            color: #ddd;
+            margin-bottom: 5px;
+        }
+
+        .total-amount {
+            font-size: 34px;
+            font-weight: bold;
+            color: #ffd36a;
+
+            text-shadow:
+                0 0 15px
+                rgba(255,211,106,0.35);
+        }
+
+        .total-note {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #aaa;
+        }
+
         .payment-grid {
 
             display: grid;
@@ -134,15 +218,15 @@
                 rgba(255,50,150,0.30);
         }
 
-        .user-name {
+        .user {
 
-            font-size: 21px;
+            font-size: 18px;
 
             font-weight: bold;
 
             color: #ff91c7;
 
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .amount {
@@ -209,6 +293,25 @@
             color: #ff8c8c;
         }
 
+        .approve-btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 9px 12px;
+            border-radius: 10px;
+            background: rgba(124, 255, 178, 0.20);
+            border: 1px solid rgba(124, 255, 178, 0.40);
+            color: #7cffb2;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .approve-btn:hover {
+            background: rgba(124, 255, 178, 0.35);
+            transform: translateY(-2px);
+        }
+
         .no-payments {
 
             text-align: center;
@@ -234,90 +337,6 @@
             }
 
         }
-        
-        	.total-card {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-
-    margin-bottom: 30px;
-    padding: 25px;
-
-    border-radius: 22px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255, 105, 180, 0.25),
-            rgba(255, 211, 106, 0.12)
-        );
-
-    border:
-        1px solid
-        rgba(255,255,255,0.25);
-
-    backdrop-filter: blur(18px);
-
-    box-shadow:
-        0 0 30px
-        rgba(255,50,150,0.20);
-
-    transition: 0.25s;
-}
-
-.total-card:hover {
-    transform: translateY(-3px);
-
-    box-shadow:
-        0 0 40px
-        rgba(255,50,150,0.35);
-}
-
-.total-icon {
-    width: 65px;
-    height: 65px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 18px;
-
-    font-size: 32px;
-
-    background:
-        rgba(255,211,106,0.15);
-
-    border:
-        1px solid
-        rgba(255,211,106,0.30);
-}
-
-.total-content {
-    flex: 1;
-}
-
-.total-label {
-    font-size: 15px;
-    color: #ddd;
-    margin-bottom: 5px;
-}
-
-.total-amount {
-    font-size: 34px;
-    font-weight: bold;
-    color: #ffd36a;
-
-    text-shadow:
-        0 0 15px
-        rgba(255,211,106,0.35);
-}
-
-.total-note {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #aaa;
-}
 
     </style>
 
@@ -340,35 +359,29 @@
 
 <div class="container">
 
+    <div class="total-card">
 
-		<div class="total-card">
-
-    <div class="total-icon">
-        💰
-    </div>
-
-    <div class="total-content">
-
-        <div class="total-label">
-            Total Money Received
+        <div class="total-icon">
+            💰
         </div>
 
-        <div class="total-amount">
-            ₹<span th:text="${totalReceived}">0</span>
-        </div>
-
-        <div class="total-note">
-            Successful payments only
+        <div class="total-content">
+            <div class="total-label">
+                Total Revenue Collected
+            </div>
+            <div class="total-amount">
+                ₹<span th:text="${totalReceived}">0</span>
+            </div>
+            <div class="total-note">
+                From all successful UPI payments
+            </div>
         </div>
 
     </div>
-
-</div>
 
     <div class="page-title">
-        💰 All Payments
+        💳 All Payment Transactions
     </div>
-
 
     <div class="payment-grid"
          th:if="${!payments.isEmpty()}">
@@ -376,33 +389,33 @@
         <div class="payment-card"
              th:each="payment : ${payments}">
 
- <div class="user-name">
+            <div class="user">
 
-    👤
-    <span
-        th:if="${userMap[payment.userId] != null}"
-        th:text="${userMap[payment.userId].name}">
-        User Name
-    </span>
+                👤
+                <span
+                    th:if="${userMap[payment.userId] != null}"
+                    th:text="${userMap[payment.userId].name}">
+                    User Name
+                </span>
 
-    <span
-        th:if="${userMap[payment.userId] == null}">
-        Unknown User
-    </span>
+                <span
+                    th:if="${userMap[payment.userId] == null}">
+                    Unknown User
+                </span>
 
-</div>
+            </div>
 
-<div class="info"
-     th:if="${userMap[payment.userId] != null}">
+            <div class="info"
+                 th:if="${userMap[payment.userId] != null}">
 
-    🎂 Age:
+                🎂 Age:
 
-    <strong
-        th:text="${userMap[payment.userId].age}">
-        20
-    </strong>
+                <strong
+                    th:text="${userMap[payment.userId].age}">
+                    20
+                </strong>
 
-</div>
+            </div>
 
 
             <div class="amount">
@@ -416,7 +429,7 @@
 
             <div class="info">
 
-                🪙 Coins:
+                🪙 Coins Credited:
 
                 <strong th:text="${payment.coins}">
                     5000
@@ -454,6 +467,15 @@
 
             </div>
 
+            <div class="info" th:if="${payment.utrNumber != null and !payment.utrNumber.isEmpty()}">
+
+                🔢 UTR / UPI Ref:
+
+                <strong th:text="${payment.utrNumber}" style="color: #ffd36a;">
+                    UTR123456
+                </strong>
+
+            </div>
 
             <div>
 
@@ -473,6 +495,15 @@
                 </span>
 
             </div>
+
+            <form th:if="${payment.status.equalsIgnoreCase('PENDING')}"
+                  th:action="@{'/admin/payments/approve/' + ${payment.id}}"
+                  method="post"
+                  onsubmit="return confirm('Approve this payment and credit ' + ${payment.coins} + ' coins to user?');">
+                <button type="submit" class="approve-btn">
+                    ✅ Approve Payment
+                </button>
+            </form>
 
         </div>
 
