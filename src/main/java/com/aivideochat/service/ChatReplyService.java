@@ -69,4 +69,8 @@ public class ChatReplyService {
 
         return replies.get(index);
     }
+    
+    public String getRandomIncomingMessage() {
+        return getRandomReply();
+    }
 }

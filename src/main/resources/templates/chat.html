@@ -460,25 +460,15 @@
       id="messages"
       th:attr="data-profile-id=${profile.id}">
 
-
-    <div class="message ai-message">
-
-        Hey! 😊
-        I'm really happy to see you here.
-
+    <div th:each="chat : ${chatHistory}"
+         class="message"
+         th:classappend="${chat.sender == 'USER'} ? ' user-message' : ' ai-message'"
+         th:text="${chat.message}">
     </div>
 
-
-    <span th:text="|I'm ${profile.name}. What would you like to talk about? 💗|"></span>
-
-
-    <div class="message typing"
-         id="typing">
-
+    <div class="message typing" id="typing">
         typing...
-
     </div>
-
 
 </main>
 
@@ -522,7 +512,7 @@
 
     const profileId =
         messages.dataset.profileId;
-
+    
 
     // =========================
     // 🪙 UPDATE COIN DISPLAY

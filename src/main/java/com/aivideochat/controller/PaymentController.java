@@ -39,7 +39,7 @@ public class PaymentController {
     @PostMapping("/api/payment/create")
     @ResponseBody
     public ResponseEntity<?> createPayment(
-            @RequestParam String packageId,
+    		@RequestParam("packageId") String packageId,
             HttpSession session) {
 
         Long userId = (Long) session.getAttribute("userId");
@@ -142,8 +142,8 @@ public class PaymentController {
     @PostMapping("/api/payment/submit-utr")
     @ResponseBody
     public ResponseEntity<?> submitUtr(
-            @RequestParam String orderId,
-            @RequestParam String utr,
+    		@RequestParam("orderId") String orderId,
+    		@RequestParam("utr") String utr,
             HttpSession session) {
 
         Long userId = (Long) session.getAttribute("userId");
@@ -268,7 +268,7 @@ public class PaymentController {
     // ========================================================
     @GetMapping("/api/payment/status")
     @ResponseBody
-    public ResponseEntity<?> getPaymentStatus(@RequestParam String orderId) {
+    public ResponseEntity<?> getPaymentStatus(@RequestParam("orderId") String orderId) {
         PaymentOrder order = paymentOrderRepository.findByOrderId(orderId).orElse(null);
         if (order == null) {
             return ResponseEntity.badRequest().body(Map.of(

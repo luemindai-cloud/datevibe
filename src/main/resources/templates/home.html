@@ -1430,12 +1430,51 @@ async function loadHomeCoins() {
 loadHomeCoins();
 
 /* ================================= */
-/* RANDOM INCOMING AI VIDEO CALL */
+/* INCOMING CALL RINGING - MP3 */
 /* ================================= */
 
-let incomingCaller = null;
+const incomingRingtone = new Audio(
+    "/sounds/incoming-call.mp3"
+);
 
-let incomingCallTimer = null;
+incomingRingtone.loop = true;
+incomingRingtone.volume = 0.75;
+incomingRingtone.preload = "auto";
+
+/* START RINGING */
+
+async function startIncomingRinging() {
+
+    stopIncomingRinging();
+
+    try {
+
+        incomingRingtone.currentTime = 0;
+
+        await incomingRingtone.play();
+
+        console.log("Incoming ringtone started");
+
+    } catch (error) {
+
+        console.warn(
+            "Ringtone playback blocked:",
+            error
+        );
+
+    }
+}
+
+/* STOP RINGING */
+
+function stopIncomingRinging() {
+
+    incomingRingtone.pause();
+
+    incomingRingtone.currentTime = 0;
+
+    console.log("Incoming ringtone stopped");
+}
 
 
 /* START RANDOM CALL */
@@ -1571,153 +1610,31 @@ function showIncomingCall() {
 }
 
 
-/* ================================= */
-/* INCOMING CALL RINGING */
-/* ================================= */
 
-let ringingContext = null;
-let ringingTimer = null;
+/* UNLOCK MP3 AUDIO AFTER USER INTERACTION */
 
-
-/* START RINGING */
-
-function startIncomingRinging() {
-
-    stopIncomingRinging();
-
+async function unlockAudio() {
     try {
+        incomingRingtone.muted = true;
 
-        ringingContext =
-            new (window.AudioContext ||
-                 window.webkitAudioContext)();
+        await incomingRingtone.play();
 
-        const playRing = () => {
+        incomingRingtone.pause();
+        incomingRingtone.currentTime = 0;
 
-            if (!ringingContext) {
-                return;
-            }
+        incomingRingtone.muted = false;
 
-            const oscillator =
-                ringingContext.createOscillator();
-
-            const gain =
-                ringingContext.createGain();
-
-            oscillator.type = "sine";
-
-            oscillator.frequency.setValueAtTime(
-                880,
-                ringingContext.currentTime
-            );
-
-            oscillator.frequency.setValueAtTime(
-                660,
-                ringingContext.currentTime + 0.25
-            );
-
-            gain.gain.setValueAtTime(
-                0.0001,
-                ringingContext.currentTime
-            );
-
-            gain.gain.exponentialRampToValueAtTime(
-                0.25,
-                ringingContext.currentTime + 0.02
-            );
-
-            gain.gain.exponentialRampToValueAtTime(
-                0.0001,
-                ringingContext.currentTime + 0.5
-            );
-
-            oscillator.connect(gain);
-
-            gain.connect(
-                ringingContext.destination
-            );
-
-            oscillator.start();
-
-            oscillator.stop(
-                ringingContext.currentTime + 0.5
-            );
-        };
-
-
-        playRing();
-
-
-        ringingTimer =
-            setInterval(
-                playRing,
-                1200
-            );
+        console.log("MP3 ringtone unlocked");
 
     } catch (error) {
-
-        console.error(
-            "❌ Ringing error:",
-            error
-        );
-
+        console.warn("Audio unlock failed:", error);
     }
+
+    document.removeEventListener("click", unlockAudio);
 }
 
+document.addEventListener("click", unlockAudio, { once: true });
 
-/* STOP RINGING */
-
-function stopIncomingRinging() {
-
-    if (ringingTimer) {
-
-        clearInterval(ringingTimer);
-
-        ringingTimer = null;
-    }
-
-
-    if (ringingContext) {
-
-        ringingContext.close()
-            .catch(() => {});
-
-        ringingContext = null;
-    }
-}
-
-/* UNLOCK AUDIO AFTER USER INTERACTION */
-
-document.addEventListener(
-    "click",
-    async function unlockAudio() {
-
-        try {
-
-            const context =
-                new (window.AudioContext ||
-                     window.webkitAudioContext)();
-
-            await context.resume();
-
-            await context.close();
-
-        } catch (error) {
-
-            console.log(
-                "Audio unlock:",
-                error
-            );
-
-        }
-
-        document.removeEventListener(
-            "click",
-            unlockAudio
-        );
-
-    },
-    { once: true }
-);
 
 /* DECLINE */
 

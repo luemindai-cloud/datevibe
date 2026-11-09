@@ -385,6 +385,150 @@
     backdrop-filter: blur(8px);
 }
 
+	/* =================================
+   FULL SCREEN AI VIDEO CALL
+================================= */
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+body {
+    display: block;
+    background: #000;
+}
+
+/* Full-screen video area */
+.video-container {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    padding: 0;
+    margin: 0;
+    z-index: 1;
+}
+
+/* Video fills the entire screen */
+.video-card {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: hidden;
+    background: #000;
+}
+
+.video-card video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Keep profile information over the video */
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.65),
+        transparent
+    );
+    border: none;
+}
+
+/* Hide information below the video */
+.call-info {
+    display: none;
+}
+
+/* Keep call controls visible */
+.controls {
+    position: absolute;
+    bottom: max(25px, env(safe-area-inset-bottom));
+    z-index: 6;
+}
+
+/* Move disclosure above call controls */
+.ai-disclosure {
+    bottom: 110px;
+    z-index: 4;
+}
+
+/* Keep status and timer visible */
+.video-status,
+.timer {
+    z-index: 4;
+}
+
+
+/* LOCAL CAMERA PREVIEW */
+.self-camera-preview {
+    display: none;
+    position: absolute;
+    top: 90px;
+    right: 18px;
+    width: 125px;
+    aspect-ratio: 3 / 4;
+    z-index: 7;
+    border: 2px solid white;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #222;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+}
+
+.self-camera-preview video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+}
+
+.self-camera-preview span {
+    position: absolute;
+    bottom: 6px;
+    left: 8px;
+    color: white;
+    font-size: 11px;
+    background: rgba(0,0,0,0.5);
+    padding: 3px 7px;
+    border-radius: 8px;
+}
+
+.camera-toggle {
+    width: 55px;
+    height: 55px;
+    margin-right: 20px;
+    border: none;
+    border-radius: 50%;
+    background: #444;
+    color: white;
+    font-size: 23px;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .self-camera-preview {
+        width: 105px;
+        top: 85px;
+        right: 12px;
+    }
+}
+
+
     </style>
 
 </head>
@@ -470,6 +614,12 @@
        loop>
 </video>
 
+<!-- YOUR LIVE CAMERA PREVIEW -->
+<div class="self-camera-preview" id="selfCameraPreview">
+    <video id="selfCameraVideo" autoplay muted playsinline></video>
+    <span>You</span>
+</div>
+
 <div class="ai-disclosure">
     ✨your Companion • 
 </div>
@@ -490,6 +640,14 @@
             </div>
 
             <div class="controls">
+            
+            
+            	<button type="button"
+        class="camera-toggle"
+        id="cameraToggle"
+        onclick="toggleSelfCamera()">
+    	📷
+		</button>
 
                 <button
                     class="end-call"
@@ -534,6 +692,50 @@
     let seconds = 0;
     let timerInterval;
     let billingInterval;
+ // LOCAL CAMERA - NOT TRANSMITTED
+    let selfCameraStream = null;
+
+    async function toggleSelfCamera() {
+
+        const preview = document.getElementById("selfCameraPreview");
+        const cameraButton = document.getElementById("cameraToggle");
+        const cameraVideo = document.getElementById("selfCameraVideo");
+
+        if (selfCameraStream) {
+            stopSelfCamera();
+            cameraButton.innerText = "📷";
+            return;
+        }
+
+        try {
+            selfCameraStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "user" },
+                audio: false
+            });
+
+            cameraVideo.srcObject = selfCameraStream;
+            preview.style.display = "block";
+            cameraButton.innerText = "📷";
+            
+        } catch (error) {
+            console.error("Camera access failed:", error);
+            alert("Unable to access your camera. Please check camera permission.");
+        }
+    }
+
+    function stopSelfCamera() {
+
+        if (selfCameraStream) {
+            selfCameraStream.getTracks().forEach(track => track.stop());
+            selfCameraStream = null;
+        }
+
+        const cameraVideo = document.getElementById("selfCameraVideo");
+        const preview = document.getElementById("selfCameraPreview");
+
+        if (cameraVideo) cameraVideo.srcObject = null;
+        if (preview) preview.style.display = "none";
+    }
 
     const sessionId =
         new URLSearchParams(window.location.search)
@@ -689,6 +891,8 @@ if (data.charged) {
         }
 
         openRechargePopup();
+        
+        stopSelfCamera();
     }
 
 
@@ -701,8 +905,11 @@ if (data.charged) {
         clearInterval(timerInterval);
         clearInterval(billingInterval);
 
+        stopSelfCamera();
+        
         window.location.href =
             "/profile/[[${profile.id}]]";
+        
     }
 
 
@@ -750,6 +957,8 @@ if (data.charged) {
             );
         }
     }
+    
+    window.addEventListener("pagehide", stopSelfCamera);
     
     
     </script>

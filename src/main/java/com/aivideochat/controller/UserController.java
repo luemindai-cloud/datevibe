@@ -1,3 +1,4 @@
+
 package com.aivideochat.controller;
 
 import org.springframework.stereotype.Controller;
@@ -5,15 +6,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.aivideochat.entity.User;
 import com.aivideochat.repository.UserRepository;
 import com.aivideochat.repository.AiProfileRepository;
+
 import jakarta.servlet.http.HttpSession;
 
 import java.util.Map;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 
 @Controller
 public class UserController {
@@ -41,8 +42,8 @@ public class UserController {
 
     @PostMapping("/quick-login")
     public String quickLogin(
-            @RequestParam String name,
-            @RequestParam int age,
+            @RequestParam("name") String name,
+            @RequestParam("age") int age,
             Model model,
             HttpSession session) {
 
@@ -50,7 +51,6 @@ public class UserController {
 
         User savedUser = userRepository.save(user);
 
-        // Remember the logged-in user
         session.setAttribute("userId", savedUser.getId());
         session.setAttribute("userName", savedUser.getName());
 
@@ -63,8 +63,7 @@ public class UserController {
 
         return "home";
     }
-    
-    // HOME ROUTE
+
     @GetMapping("/home")
     public String showHome(Model model) {
 
@@ -75,7 +74,7 @@ public class UserController {
 
         return "home";
     }
-    
+
     @GetMapping("/api/user/coins")
     @ResponseBody
     public Map<String, Object> getUserCoins(HttpSession session) {
@@ -83,20 +82,13 @@ public class UserController {
         Long userId = (Long) session.getAttribute("userId");
 
         if (userId == null) {
-            return Map.of(
-                    "loggedIn", false,
-                    "coins", 0
-            );
+            return Map.of("loggedIn", false, "coins", 0);
         }
 
-        User user = userRepository.findById(userId)
-                .orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
 
         if (user == null) {
-            return Map.of(
-                    "loggedIn", false,
-                    "coins", 0
-            );
+            return Map.of("loggedIn", false, "coins", 0);
         }
 
         return Map.of(
@@ -104,11 +96,11 @@ public class UserController {
                 "coins", user.getCoins()
         );
     }
-    
+
     @PostMapping("/api/test/add-coins")
     @ResponseBody
     public Map<String, Object> addTestCoins(
-            @RequestParam int coins,
+            @RequestParam("coins") int coins,
             HttpSession session) {
 
         Long userId = (Long) session.getAttribute("userId");
@@ -138,22 +130,19 @@ public class UserController {
                 "message", "Test coins added"
         );
     }
-    
+
     @GetMapping("/user-profile")
     public String showUserProfile(
             Model model,
             HttpSession session) {
 
-        Long userId =
-                (Long) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
 
         if (userId == null) {
             return "redirect:/quick-login";
         }
 
-        User user =
-                userRepository.findById(userId)
-                        .orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
 
         if (user == null) {
             return "redirect:/quick-login";
@@ -163,16 +152,15 @@ public class UserController {
 
         return "user-profile";
     }
-     
+
     @PostMapping("/api/user/update-profile")
     @ResponseBody
     public Map<String, Object> updateProfile(
-            @RequestParam String name,
-            @RequestParam int age,
+            @RequestParam("name") String name,
+            @RequestParam("age") int age,
             HttpSession session) {
 
-        Long userId =
-                (Long) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
 
         if (userId == null) {
             return Map.of(
@@ -181,9 +169,7 @@ public class UserController {
             );
         }
 
-        User user =
-                userRepository.findById(userId)
-                        .orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
 
         if (user == null) {
             return Map.of(
@@ -211,7 +197,6 @@ public class UserController {
 
         userRepository.save(user);
 
-        // Update session name too
         session.setAttribute("userName", user.getName());
 
         return Map.of(
@@ -220,15 +205,12 @@ public class UserController {
                 "age", user.getAge()
         );
     }
-    
+
     @GetMapping("/logout")
     public String logout(HttpSession session) {
 
-        // Destroy the current login session
         session.invalidate();
 
-        // Go back to Deedi welcome page
         return "redirect:/";
     }
-    
 }

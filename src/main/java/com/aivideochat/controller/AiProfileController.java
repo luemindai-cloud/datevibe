@@ -44,7 +44,7 @@ public class AiProfileController {
     // =====================================================
     @GetMapping("/profile/{id}")
     public String showProfile(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             Model model) {
 
         AiProfile profile = aiProfileRepository.findById(id).orElse(null);
@@ -94,13 +94,13 @@ public class AiProfileController {
     // =====================================================
     @PostMapping("/admin/profiles/add")
     public String addProfile(
-            @RequestParam String name,
-            @RequestParam int age,
-            @RequestParam String description,
-            @RequestParam String personality,
+    		@RequestParam("name") String name,
+    		@RequestParam("age") int age,
+    		@RequestParam("description") String description,
+    		@RequestParam("personality") String personality,
             @RequestParam("profileImage") MultipartFile profileImage,
             @RequestParam("videoFile") MultipartFile videoFile,
-            @RequestParam(defaultValue = "false") boolean online,
+            @RequestParam(value = "online", defaultValue = "false") boolean online,
             HttpSession session,
             Model model) {
 
@@ -171,7 +171,7 @@ public class AiProfileController {
     // =====================================================
     @PostMapping("/admin/profiles/delete/{id}")
     public String deleteProfile(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             HttpSession session) {
 
         if (!isAdmin(session)) {
